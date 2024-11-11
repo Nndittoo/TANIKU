@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "pemrograman_mobile" "\0"
+            VALUE "FileDescription", "taniku" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "pemrograman_mobile" "\0"
+            VALUE "InternalName", "taniku" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "pemrograman_mobile.exe" "\0"
-            VALUE "ProductName", "pemrograman_mobile" "\0"
+            VALUE "OriginalFilename", "taniku.exe" "\0"
+            VALUE "ProductName", "taniku" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -18,8 +18,8 @@ class SearchPage extends StatelessWidget {
               onPressed: () {
                 Navigator.pop(context);
               },
-              icon: Icon(Icons.arrow_back, color: Colors.grey),
-              label: Text(
+              icon: const Icon(Icons.arrow_back, color: Colors.grey),
+              label: const Text(
                 "Kembali",
                 style: TextStyle(color: Colors.grey),
               ),
@@ -30,9 +30,9 @@ class SearchPage extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             // Teks Pencarian di tengah
-            Expanded(
+            const Expanded(
               child: Center(
                 child: Text(
                   "Pencarian",
@@ -56,8 +56,8 @@ class SearchPage extends StatelessWidget {
             TextField(
               decoration: InputDecoration(
                 hintText: "Cari...",
-                contentPadding: EdgeInsets.symmetric(vertical: 10),
-                prefixIcon: Icon(Icons.search, color: Colors.grey),
+                contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 filled: true,
                 fillColor: Colors.grey[200],
                 border: OutlineInputBorder(
@@ -66,12 +66,12 @@ class SearchPage extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             // Bagian riwayat pencarian
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
+                const Row(
                   children: [
                     Icon(Icons.history, color: Colors.grey),
                     SizedBox(width: 8),
@@ -82,18 +82,18 @@ class SearchPage extends StatelessWidget {
                   ],
                 ),
                 IconButton(
-                  icon: Icon(Icons.clear, color: Colors.grey),
+                  icon: const Icon(Icons.clear, color: Colors.grey),
                   onPressed: () {
                     // Tindakan untuk menghapus riwayat pencarian
                   },
                 ),
               ],
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             // Daftar riwayat pencarian (contoh statis)
             Expanded(
               child: ListView(
-                children: [
+                children: const [
                   ListTile(
                     title: Text("Pencarian 1"),
                     leading: Icon(Icons.search, color: Colors.green),

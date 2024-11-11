@@ -1,4 +1,4 @@
-package com.example.pemrograman_mobile
+package com.example.taniku
 
 import io.flutter.embedding.android.FlutterActivity
 

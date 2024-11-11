@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:pemrograman_mobile/page/auth/login.dart';
-import 'package:pemrograman_mobile/page/home.dart';
-import 'package:pemrograman_mobile/page/search.dart';
-import 'package:pemrograman_mobile/page/splash.dart';
-import 'package:pemrograman_mobile/page/start.dart';
+import 'package:taniku/page/start.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
