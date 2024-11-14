@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pemrograman_mobile/page/auth/login.dart';
 import 'package:pemrograman_mobile/page/auth/register.dart';
+import 'package:pemrograman_mobile/page/profil.dart';
 import 'package:pemrograman_mobile/page/search.dart';
 
 class HomePage extends StatefulWidget {
@@ -36,11 +37,15 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Image.asset("asset/img/inbox.png"),
-            color: Colors.black,
+            icon: Icon(Icons.mark_email_unread_outlined),
+            color: Colors.black87,
+            iconSize: 32,
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const ProfilePage()));
+            },
             icon: CircleAvatar(
               backgroundImage: AssetImage("asset/img/profil.jpg"),
             ),
@@ -75,8 +80,11 @@ class _HomePageState extends State<HomePage> {
                     MaterialPageRoute(
                         builder: (context) => const AddPostPage()));
               }, // Aksi untuk tambah postingan
-              backgroundColor: Colors.green,
-              child: Icon(Icons.add, color: Colors.white,),
+              backgroundColor: const Color(0xff00813E),
+              child: Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
             ),
             SizedBox(height: 10),
             FloatingActionButton(
@@ -86,8 +94,11 @@ class _HomePageState extends State<HomePage> {
                     MaterialPageRoute(
                         builder: (context) => const SearchPage()));
               }, // Aksi untuk pencarian
-              backgroundColor: Colors.green,
-              child: Icon(Icons.search, color: Colors.white,),
+              backgroundColor: const Color(0xff00813E),
+              child: Icon(
+                Icons.search,
+                color: Colors.white,
+              ),
               mini: true,
             ),
           ],
@@ -95,7 +106,8 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.green,
+        backgroundColor: Colors.white,
+        selectedItemColor: const Color(0xff00813E),
         currentIndex: _currentIndex, // Setel indeks aktif
         onTap: (index) {
           setState(() {
@@ -195,11 +207,17 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const MarketPricePage()));
+                  },
                   child: Text(
                     "Selengkapnya",
                     style: TextStyle(
-                      color: Colors.green,
+                      fontSize: 16,
+                      color: const Color(0xff00813E),
                     ),
                   ),
                 ),
@@ -241,7 +259,7 @@ class _HomePageState extends State<HomePage> {
                   child: Text(
                     "Selengkapnya",
                     style: TextStyle(
-                      color: Colors.green,
+                      color: const Color(0xff00813E),
                     ),
                   ),
                 ),
@@ -298,8 +316,11 @@ class MarketPricePage extends StatelessWidget {
                 ),
                 TextButton.icon(
                   onPressed: () {},
-                  icon: Icon(Icons.sort, color: Colors.green),
-                  label: Text("Sortir", style: TextStyle(color: Colors.green)),
+                  icon: Icon(Icons.sort, color: const Color(0xff00813E)),
+                  label: Text(
+                    "Sortir",
+                    style: TextStyle(color: const Color(0xff00813E)),
+                  ),
                 ),
               ],
             ),
@@ -344,7 +365,7 @@ class MarketPricePage extends StatelessWidget {
                 IconButton(
                   onPressed: () {},
                   icon: Icon(Icons.arrow_back),
-                  color: Colors.green,
+                  color: const Color(0xff00813E),
                 ),
                 Text(
                   "Page 1 of 5",
@@ -353,7 +374,7 @@ class MarketPricePage extends StatelessWidget {
                 IconButton(
                   onPressed: () {},
                   icon: Icon(Icons.arrow_forward),
-                  color: Colors.green,
+                  color: const Color(0xff00813E),
                 ),
               ],
             ),
@@ -391,7 +412,7 @@ class FruitCard extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12), // Radius card
             side: BorderSide(
-                color: Colors.green.withOpacity(0.3),
+                color: const Color(0xff00813E).withOpacity(0.3),
                 width: 1), // Border hijau yang lebih lembut
           ),
           child: Padding(
@@ -419,7 +440,7 @@ class FruitCard extends StatelessWidget {
                 Text(
                   price,
                   style: TextStyle(
-                    color: Colors.green[800],
+                    color: const Color(0xff00813E),
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),
@@ -477,7 +498,7 @@ class FruitCardH extends StatelessWidget {
                   Text(
                     price,
                     style: TextStyle(
-                      color: Colors.green,
+                      color: const Color(0xff00813E),
                       fontSize: 14,
                     ),
                     textAlign: TextAlign.center,
@@ -704,7 +725,7 @@ class ObatPage extends StatelessWidget {
                     TabBar(
                       labelColor: Colors.black,
                       unselectedLabelColor: Colors.grey,
-                      indicatorColor: Colors.green,
+                      indicatorColor: const Color(0xff00813E),
                       tabs: [
                         Tab(text: "Cair"),
                         Tab(text: "Bubuk"),
@@ -820,7 +841,7 @@ class CuacaPage extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 decoration: BoxDecoration(
-                  color: Colors.green,
+                  color: const Color(0xff00813E),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -963,32 +984,8 @@ class SearchPage extends StatelessWidget {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Tombol kembali di sisi kiri
-            TextButton.icon(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.arrow_back, color: Colors.grey),
-              label: Text(
-                "Kembali",
-                style: TextStyle(color: Colors.grey),
-              ),
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.grey[200],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-            Spacer(), // Untuk memberikan ruang di antara tombol kembali dan teks pencarian
-            // Teks Pencarian di tengah
-            Text(
-              "Pencarian",
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
+            Center(
+              child: Text("Pencarian"),
             ),
             Spacer(), // Spacer kedua untuk menjaga posisi teks tetap di tengah
           ],
@@ -1043,15 +1040,15 @@ class SearchPage extends StatelessWidget {
                 children: [
                   ListTile(
                     title: Text("Pencarian 1"),
-                    leading: Icon(Icons.search, color: Colors.green),
+                    leading: Icon(Icons.search, color: const Color(0xff00813E)),
                   ),
                   ListTile(
                     title: Text("Pencarian 2"),
-                    leading: Icon(Icons.search, color: Colors.green),
+                    leading: Icon(Icons.search, color: const Color(0xff00813E)),
                   ),
                   ListTile(
                     title: Text("Pencarian 3"),
-                    leading: Icon(Icons.search, color: Colors.green),
+                    leading: Icon(Icons.search, color: const Color(0xff00813E)),
                   ),
                 ],
               ),
@@ -1095,7 +1092,8 @@ class _AddPostPageState extends State<AddPostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView( // Membungkus konten dalam SingleChildScrollView
+      body: SingleChildScrollView(
+        // Membungkus konten dalam SingleChildScrollView
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -1116,8 +1114,9 @@ class _AddPostPageState extends State<AddPostPage> {
                 child: Text(
                   "Post",
                   style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                    fontFamily: "Righteous",
+                    fontSize: 26,
+                    fontWeight: FontWeight.w400,
                     color: Colors.black,
                   ),
                 ),
@@ -1149,17 +1148,20 @@ class _AddPostPageState extends State<AddPostPage> {
                       // Fungsi untuk memposting konten
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
+                      backgroundColor: const Color(0xff00813E),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                     child: Text(
-                      "Posting",
-                      style: TextStyle(color: Colors.white),
+                      "Video Baru",
+                      style: TextStyle(
+                        fontFamily: "Righteous",
+                          color: Colors.white), // Atur warna teks menjadi putih
                     ),
                   ),
                 ),
+
               SizedBox(height: 5),
               // Tombol "Video Baru" dan "Foto Baru" di luar TextField
               Row(
@@ -1172,7 +1174,8 @@ class _AddPostPageState extends State<AddPostPage> {
                     icon: Icon(Icons.video_camera_back, color: Colors.white),
                     label: Text("Video Baru"),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
+                      iconColor: Colors.white,
+                      backgroundColor: const Color(0xff00813E),
                       textStyle: TextStyle(
                         color: Colors.white,
                       ),
@@ -1185,7 +1188,7 @@ class _AddPostPageState extends State<AddPostPage> {
                     icon: Icon(Icons.photo_camera, color: Colors.white),
                     label: Text("Foto Baru"),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
+                      backgroundColor: const Color(0xff00813E),
                       textStyle: TextStyle(
                         color: Colors.white,
                       ),
@@ -1193,17 +1196,16 @@ class _AddPostPageState extends State<AddPostPage> {
                   ),
                 ],
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 15),
               // Judul untuk "Postingan dari Petani Lain"
               Text(
                 "Postingan dari Petani Lain",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 10),
-              // Daftar postingan dari petani lain
               ListView.builder(
                 shrinkWrap: true, // Agar ListView menyesuaikan ukuran konten
-                physics: NeverScrollableScrollPhysics(), // Menonaktifkan scroll pada ListView agar tidak bentrok dengan SingleChildScrollView
+                physics:
+                    NeverScrollableScrollPhysics(), // Menonaktifkan scroll pada ListView agar tidak bentrok dengan SingleChildScrollView
                 itemCount: 3, // Contoh jumlah postingan
                 itemBuilder: (context, index) {
                   return Container(
