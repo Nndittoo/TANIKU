@@ -1,14 +1,72 @@
+import 'dart:developer';
+import 'auth_service.dart';
 import 'package:flutter/material.dart';
-import 'package:pemrograman_mobile/page/auth/login.dart';
-import 'package:pemrograman_mobile/page/home.dart';
+import 'package:taniku/page/auth/login.dart';
+import 'package:taniku/page/home.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
+  @override
+  _RegisterPageState createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  final _auth = AuthService();
+
+  final _name = TextEditingController();
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+  final _confirmPassword = TextEditingController();
+
+// proses jika diklik tombol daftar
+  _register() async {
+    if (_email.text.isEmpty || _password.text.isEmpty || _name.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Tolong masukkan nama atau email atau password anda"),
+        ),
+      );
+      return;
+    } else {
+      if (_password.text == _confirmPassword.text) {
+        final user = await _auth.createUserWithEmailAndPassword(
+            _email.text, _password.text);
+        if (user != null) {
+          log("User Create Successfully");
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Registrasi berhasil"),
+            ),
+          );
+          goToHome(context);
+        } else {
+          log("Registration failed");
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Registrasi gagal,"),
+            ),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Password tidak sama"),
+          ),
+        );
+      }
+    }
+  }
+
+  goToLogin(BuildContext context) => Navigator.push(
+      context, MaterialPageRoute(builder: (context) => const LoginPage()));
+
+  goToHome(BuildContext context) => Navigator.push(
+      context, MaterialPageRoute(builder: (context) => const HomePage()));
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      body: SizedBox(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         child: Stack(
@@ -35,16 +93,16 @@ class RegisterPage extends StatelessWidget {
                           'asset/img/logo-daun.png',
                           width: 120,
                         ),
-                        Text(
+                        const Text(
                           "Daftar",
                           style: TextStyle(
                             fontFamily: "Righteous",
                             fontSize: 40,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xff000000),
+                            color: Color(0xff000000),
                           ),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         Container(
                           width: MediaQuery.of(context).size.width,
                           decoration: BoxDecoration(
@@ -55,7 +113,7 @@ class RegisterPage extends StatelessWidget {
                                 color: Colors.grey.withOpacity(0.5),
                                 spreadRadius: 2,
                                 blurRadius: 10,
-                                offset: Offset(0, 3),
+                                offset: const Offset(0, 3),
                               ),
                             ],
                           ),
@@ -64,16 +122,17 @@ class RegisterPage extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text(
+                                const Text(
                                   "Daftar Akun Baru",
                                   style: TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.w400,
-                                    color: const Color(0xff00813E),
+                                    color: Color(0xff00813E),
                                   ),
                                 ),
-                                SizedBox(height: 20),
+                                const SizedBox(height: 20),
                                 TextField(
+                                  controller: _name,
                                   decoration: InputDecoration(
                                     labelText: "Nama Lengkap",
                                     border: OutlineInputBorder(
@@ -81,8 +140,10 @@ class RegisterPage extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                SizedBox(height: 20),
+                                const SizedBox(height: 20),
                                 TextField(
+                                  controller: _email,
+                                  keyboardType: TextInputType.emailAddress,
                                   decoration: InputDecoration(
                                     labelText: "Email",
                                     border: OutlineInputBorder(
@@ -90,8 +151,9 @@ class RegisterPage extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                SizedBox(height: 20),
+                                const SizedBox(height: 20),
                                 TextField(
+                                  controller: _password,
                                   obscureText: true,
                                   decoration: InputDecoration(
                                     labelText: "Password",
@@ -100,8 +162,9 @@ class RegisterPage extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                SizedBox(height: 20),
+                                const SizedBox(height: 20),
                                 TextField(
+                                  controller: _confirmPassword,
                                   obscureText: true,
                                   decoration: InputDecoration(
                                     labelText: "Konfirmasi Password",
@@ -110,25 +173,19 @@ class RegisterPage extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                SizedBox(height: 20),
+                                const SizedBox(height: 20),
                                 SizedBox(
                                   width: double.infinity,
                                   height: 50,
                                   child: ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const HomePage()));
-                                    },
+                                    onPressed: _register,
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color(0xff00813E),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(15),
                                       ),
                                     ),
-                                    child: Text(
+                                    child: const Text(
                                       "Daftar",
                                       style: TextStyle(
                                         color: Colors.white,
@@ -141,8 +198,8 @@ class RegisterPage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(height: 30),
-                        Row(
+                        const SizedBox(height: 30),
+                        const Row(
                           children: [
                             Expanded(
                               child: Divider(
@@ -151,8 +208,7 @@ class RegisterPage extends StatelessWidget {
                               ),
                             ),
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
+                              padding: EdgeInsets.symmetric(horizontal: 10),
                               child: Text(
                                 "Masuk dengan",
                                 style: TextStyle(color: Colors.grey),
@@ -166,36 +222,24 @@ class RegisterPage extends StatelessWidget {
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             IconButton(
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const HomePage()));
-                              },
+                              onPressed: () => goToHome(context),
                               icon: Image.asset(
                                 'asset/img/facebook.png',
                                 width: 45,
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 20,
                             ),
                             IconButton(
-                              onPressed: () {
-                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const HomePage()));
-                              },
+                              onPressed: () => goToHome(context),
                               icon: Image.asset(
                                 "asset/img/google.png",
                                 width: 45,
@@ -203,11 +247,11 @@ class RegisterPage extends StatelessWidget {
                             ),
                           ],
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
+                            const Text(
                               "Sudah punya akun?",
                               style: TextStyle(
                                 color: Colors.grey,
@@ -215,17 +259,11 @@ class RegisterPage extends StatelessWidget {
                               ),
                             ),
                             GestureDetector(
-                              onTap: () {
-                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const LoginPage()));
-                              },
-                              child: Text(
+                              onTap: () => goToLogin(context),
+                              child: const Text(
                                 " Masuk",
                                 style: TextStyle(
-                                  color: const Color(0xff00813E),
+                                  color: Color(0xff00813E),
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),

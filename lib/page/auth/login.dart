@@ -1,14 +1,70 @@
 import 'package:flutter/material.dart';
-import 'package:pemrograman_mobile/page/auth/register.dart';
-import 'package:pemrograman_mobile/page/home.dart';
+import 'package:taniku/page/auth/register.dart';
+import 'package:taniku/page/home.dart';
+import 'dart:developer';
+import 'auth_service.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final auth = AuthService();
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+
+  goToRegister(BuildContext context) => Navigator.push(
+      context, MaterialPageRoute(builder: (context) => const RegisterPage()));
+
+  goToHome(BuildContext context) => Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const HomePage()),
+      (Route<dynamic> route) => false);
+
+  @override
+  void dispose() {
+    super.dispose();
+    _email.dispose();
+    _password.dispose();
+  }
+
+  _login() async {
+    if (_email.text.isEmpty || _password.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Tolong masukkan email atau password anda"),
+        ),
+      );
+      return;
+    } else {
+      final user =
+          await auth.loginUserWithEmailAndPassword(_email.text, _password.text);
+      if (user != null) {
+        log("User logged in");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Login berhasil"),
+          ),
+        );
+        goToHome(context);
+      } else {
+        log("Login failed");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Login gagal, coba lagi"),
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      body: SizedBox(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         child: Stack(
@@ -30,21 +86,22 @@ class LoginPage extends StatelessWidget {
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Image.asset(
                           'asset/img/logo-daun.png',
                           width: 120,
                         ),
-                        Text(
+                        const Text(
                           "Masuk",
                           style: TextStyle(
                             fontFamily: "Righteous",
                             fontSize: 40,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xff000000),
+                            color: Color(0xff000000),
                           ),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         Container(
                           width: MediaQuery.of(context).size.width,
                           decoration: BoxDecoration(
@@ -55,7 +112,7 @@ class LoginPage extends StatelessWidget {
                                 color: Colors.grey.withOpacity(0.5),
                                 spreadRadius: 2,
                                 blurRadius: 10,
-                                offset: Offset(0, 3),
+                                offset: const Offset(0, 3),
                               ),
                             ],
                           ),
@@ -64,16 +121,18 @@ class LoginPage extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text(
+                                const Text(
                                   "Masuk Sekarang",
                                   style: TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.w400,
-                                    color: const Color(0xff00813E),
+                                    color: Color(0xff00813E),
                                   ),
                                 ),
-                                SizedBox(height: 20),
+                                const SizedBox(height: 20),
                                 TextField(
+                                  controller: _email,
+                                  keyboardType: TextInputType.emailAddress,
                                   decoration: InputDecoration(
                                     labelText: "Email",
                                     border: OutlineInputBorder(
@@ -81,8 +140,9 @@ class LoginPage extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                SizedBox(height: 20),
+                                const SizedBox(height: 20),
                                 TextField(
+                                  controller: _password,
                                   obscureText: true,
                                   decoration: InputDecoration(
                                     labelText: "Password",
@@ -91,25 +151,20 @@ class LoginPage extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                SizedBox(height: 20),
+                                const SizedBox(height: 20),
                                 SizedBox(
+                                  //login button
                                   width: double.infinity,
                                   height: 50,
                                   child: ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const HomePage()));
-                                    },
+                                    onPressed: _login,
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color(0xff00813E),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(15),
                                       ),
                                     ),
-                                    child: Text(
+                                    child: const Text(
                                       "Masuk",
                                       style: TextStyle(
                                         color: Colors.white,
@@ -122,8 +177,8 @@ class LoginPage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(height: 30),
-                        Row(
+                        const SizedBox(height: 30),
+                        const Row(
                           children: [
                             Expanded(
                               child: Divider(
@@ -132,8 +187,7 @@ class LoginPage extends StatelessWidget {
                               ),
                             ),
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
+                              padding: EdgeInsets.symmetric(horizontal: 10),
                               child: Text(
                                 "Masuk dengan",
                                 style: TextStyle(color: Colors.grey),
@@ -147,36 +201,24 @@ class LoginPage extends StatelessWidget {
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             IconButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const HomePage()),
-                                );
-                              },
+                              onPressed: () => goToHome(context),
                               icon: Image.asset(
                                 'asset/img/facebook.png',
                                 width: 45,
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 20,
                             ),
                             IconButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const HomePage()),
-                                );
-                              },
+                              onPressed: () => goToHome(context),
                               icon: Image.asset(
                                 "asset/img/google.png",
                                 width: 45,
@@ -184,11 +226,11 @@ class LoginPage extends StatelessWidget {
                             ),
                           ],
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
+                            const Text(
                               "Belum punya akun?",
                               style: TextStyle(
                                 color: Colors.grey,
@@ -196,18 +238,11 @@ class LoginPage extends StatelessWidget {
                               ),
                             ),
                             GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const RegisterPage()),
-                                );
-                              },
-                              child: Text(
+                              onTap: () => goToRegister(context),
+                              child: const Text(
                                 " Daftar",
                                 style: TextStyle(
-                                  color: const Color(0xff00813E),
+                                  color: Color(0xff00813E),
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),

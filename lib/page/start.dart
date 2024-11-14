@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pemrograman_mobile/page/auth/login.dart';
-import 'package:pemrograman_mobile/page/auth/register.dart';
+import 'package:taniku/page/auth/login.dart';
+import 'package:taniku/page/auth/register.dart';
 
 class StartPage extends StatelessWidget {
   const StartPage({super.key});
@@ -8,7 +8,7 @@ class StartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      body: SizedBox(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         child: Stack(
@@ -17,8 +17,8 @@ class StartPage extends StatelessWidget {
             Positioned(
               top: 0,
               right: 0,
-              child: Image.asset('asset/img/bola-atas.png'),
               width: 100,
+              child: Image.asset('asset/img/bola-atas.png'),
             ),
             // Bola di sudut kiri bawah
             Positioned(
@@ -49,10 +49,10 @@ class StartPage extends StatelessWidget {
                   width: 250, // Sesuaikan ukuran logo
                   height: 190,
                 ),
-                SizedBox(height: 20), // Spasi antara logo dan judul
+                const SizedBox(height: 20), // Spasi antara logo dan judul
                 // Judul
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 15.0),
                   child: Text(
                     'Selamat datang di Taniku',
                     textAlign: TextAlign.left,
@@ -63,10 +63,10 @@ class StartPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 10), // Spasi antara judul dan paragraf
+                const SizedBox(height: 10), // Spasi antara judul dan paragraf
                 // Paragraf
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 15.0),
                   child: Text(
                     'Untuk melanjutkan aplikasi, silahkan Masuk jika sudah mempunyai akun dan Daftar untuk mendaftar akun baru.',
                     textAlign: TextAlign.justify,
@@ -74,22 +74,24 @@ class StartPage extends StatelessWidget {
                       fontSize: 20,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'Montserrat',
-                      color: const Color(0xff000000),
+                      color: Color(0xff000000),
                     ),
                   ),
                 ),
-                SizedBox(height: 20), // Spasi antara paragraf dan tombol
+                const SizedBox(height: 20), // Spasi antara paragraf dan tombol
                 // Tombol
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
+                    SizedBox(
                       width: 400,
                       height: 50,
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.push(context,
-                          MaterialPageRoute(builder: (context)=> const LoginPage()),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LoginPage()),
                           );
                         },
                         style: ElevatedButton.styleFrom(
@@ -99,10 +101,10 @@ class StartPage extends StatelessWidget {
                                 BorderRadius.circular(15), // Mengatur radius
                           ),
                         ),
-                        child: Text(
+                        child: const Text(
                           'Masuk',
                           style: TextStyle(
-                            color: const Color(0xffFFFFFF),
+                            color: Color(0xffFFFFFF),
                             fontSize: 20,
                           ),
                         ),
@@ -110,23 +112,25 @@ class StartPage extends StatelessWidget {
                     )
                   ],
                 ),
-                SizedBox(height: 5),
+                const SizedBox(height: 5),
 
-                Container(
+                SizedBox(
                   width: 400,
                   height: 50,
                   child: TextButton(
                     onPressed: () {
-                          Navigator.push(context,
-                          MaterialPageRoute(builder: (context)=> const RegisterPage()),
-                          );
-                        },
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const RegisterPage()),
+                      );
+                    },
                     style: TextButton.styleFrom(
                       backgroundColor: Colors
                           .transparent, // Latar belakang button transparan
                       padding: EdgeInsets.zero, // Menghilangkan padding default
                     ),
-                    child: Text(
+                    child: const Text(
                       'Daftar',
                       style: TextStyle(
                         color: Color(0xff000000), // Warna teks hitam

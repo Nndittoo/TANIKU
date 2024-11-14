@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "132880077543",
+    "project_id": "taniku-a66e2",
+    "storage_bucket": "taniku-a66e2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:132880077543:android:e31a5830fe71a580450842",
+        "android_client_info": {
+          "package_name": "com.example.taniku"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDKQxLk2sQXS1dyqg1_6dOUzF7h1lgkZXQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
