@@ -1282,8 +1282,34 @@ class _AddPostPageState extends State<AddPostPage> {
                 shrinkWrap: true, // Agar ListView menyesuaikan ukuran konten
                 physics:
                     const NeverScrollableScrollPhysics(), // Menonaktifkan scroll pada ListView agar tidak bentrok dengan SingleChildScrollView
-
-),
+                itemCount: 3, // Contoh jumlah postingan
+                itemBuilder: (context, index) {
+                  return Container(
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Nama pengguna dan waktu posting
+                          Row(
+                            children: [
+                              const CircleAvatar(
+                                backgroundImage:
+                                    AssetImage("asset/img/profil.jpg"),
+                                radius: 20,
+                              ),
                               const SizedBox(width: 10),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
