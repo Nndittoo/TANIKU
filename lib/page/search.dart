@@ -9,38 +9,37 @@ class SearchPage extends StatelessWidget {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
-        elevation: 1,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        elevation: 0,
+        toolbarHeight: 90, // Mengatur tinggi AppBar lebih optimal
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Tombol kembali
-            TextButton.icon(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(Icons.arrow_back, color: Colors.grey),
-              label: const Text(
-                "Kembali",
-                style: TextStyle(color: Colors.grey),
-              ),
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.grey[200],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+            Align(
+              alignment: Alignment.topLeft,
+              child: TextButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.arrow_back, color: Colors.grey),
+                label: const Text(
+                  "Kembali",
+                  style: TextStyle(color: Colors.grey),
+                ),
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
             ),
-            const SizedBox(width: 16),
-            // Teks Pencarian di tengah
-            const Expanded(
-              child: Center(
-                child: Text(
-                  "Pencarian",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
+            const Center(
+              child: Text(
+                "Pencarian",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
                 ),
               ),
             ),
@@ -52,7 +51,6 @@ class SearchPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Field pencarian
             TextField(
               decoration: InputDecoration(
                 hintText: "Cari...",
@@ -67,7 +65,6 @@ class SearchPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            // Bagian riwayat pencarian
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -89,20 +86,18 @@ class SearchPage extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-            // Daftar riwayat pencarian (contoh statis)
             Expanded(
               child: ListView(
-                children: const [
-                  ListTile(
+                children: [
+                  const ListTile(
                     title: Text("Pencarian 1"),
                     leading: Icon(Icons.search, color: Colors.green),
                   ),
-                  ListTile(
+                  const ListTile(
                     title: Text("Pencarian 2"),
                     leading: Icon(Icons.search, color: Colors.green),
                   ),
-                  ListTile(
+                  const ListTile(
                     title: Text("Pencarian 3"),
                     leading: Icon(Icons.search, color: Colors.green),
                   ),

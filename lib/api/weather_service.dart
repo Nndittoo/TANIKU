@@ -1,12 +1,12 @@
-// lib/weather_service.dart
 import 'dart:convert';
 import 'dart:developer';
 import 'package:http/http.dart' as http;
 
 class WeatherService {
   final String apiKey =
-      '6467bb2e8d015f23f0b6068f7d23b589'; // Ganti dengan API key Anda dari OpenWeatherMap
+      '6467bb2e8d015f23f0b6068f7d23b589'; // Ganti dengan API key Anda
 
+  // Fetch current weather data
   Future<Map<String, dynamic>?> fetchWeatherData(String cityName) async {
     final url =
         'https://api.openweathermap.org/data/2.5/weather?q=$cityName,ID&appid=$apiKey&units=metric&lang=id';
@@ -25,6 +25,7 @@ class WeatherService {
     }
   }
 
+  // Fetch 5-day forecast data and filter for midday forecasts
   Future<List<Map<String, dynamic>>?> fetchForecastData(String cityName) async {
     final url =
         'https://api.openweathermap.org/data/2.5/forecast?q=$cityName,ID&appid=$apiKey&units=metric&lang=id';
@@ -32,29 +33,21 @@ class WeatherService {
     try {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        final List<dynamic> list = data['list'];
 
-        // Kelompokkan data menjadi satu set per hari
-        final Map<String, List<Map<String, dynamic>>> dailyData = {};
-        for (var entry in data['list']) {
-          final date =
-              entry['dt_txt'].substring(0, 10); // Ambil hanya tanggalnya
-          if (!dailyData.containsKey(date)) {
-            dailyData[date] = [];
-          }
-          dailyData[date]?.add(entry);
-        }
+        // Filter only forecasts with time "12:00:00"
+        final List<Map<String, dynamic>> middayForecasts = list
+            .where((item) => item['dt_txt'].endsWith('12:00:00'))
+            .map((item) => {
+                  'date': item['dt_txt'],
+                  'temp': item['main']['temp'],
+                  'weather': item['weather'][0]['description'],
+                  'icon': item['weather'][0]['main'],
+                })
+            .toList();
 
-        // Ambil data pertama jika jumlah data kurang dari 5
-        return dailyData.entries.map((entry) {
-          final dayData =
-              entry.value.length >= 4 ? entry.value[4] : entry.value[0];
-          return {
-            'date': entry.key,
-            'temp': dayData['main']['temp'],
-            'description': dayData['weather'][0]['description'],
-          };
-        }).toList();
+        return middayForecasts;
       } else {
         log('Error: ${response.statusCode}');
         return null;

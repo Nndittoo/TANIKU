@@ -40,106 +40,105 @@ class StartPage extends StatelessWidget {
               ),
             ),
             // Konten di tengah layar
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Logo
-                Image.asset(
-                  'asset/img/logo.png',
-                  width: 250, // Sesuaikan ukuran logo
-                  height: 190,
-                ),
-                const SizedBox(height: 20), // Spasi antara logo dan judul
-                // Judul
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 15.0),
-                  child: Text(
-                    'Selamat datang di Taniku',
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      fontFamily: 'Righteous',
-                      fontSize: 28,
-                      fontWeight: FontWeight.w300,
-                    ),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Logo
+                  Image.asset(
+                    'asset/img/logo.png',
+                    width: 250,
+                    height: 190,
                   ),
-                ),
-                const SizedBox(height: 10), // Spasi antara judul dan paragraf
-                // Paragraf
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 15.0),
-                  child: Text(
-                    'Untuk melanjutkan aplikasi, silahkan Masuk jika sudah mempunyai akun dan Daftar untuk mendaftar akun baru.',
-                    textAlign: TextAlign.justify,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'Montserrat',
-                      color: Color(0xff000000),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20), // Spasi antara paragraf dan tombol
-                // Tombol
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 400,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const LoginPage()),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xff00813E),
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(15), // Mengatur radius
-                          ),
-                        ),
-                        child: const Text(
-                          'Masuk',
-                          style: TextStyle(
-                            color: Color(0xffFFFFFF),
-                            fontSize: 20,
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(height: 5),
+                  const SizedBox(height: 20), // Spasi antara logo dan judul
 
-                SizedBox(
-                  width: 400,
-                  height: 50,
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const RegisterPage()),
-                      );
-                    },
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors
-                          .transparent, // Latar belakang button transparan
-                      padding: EdgeInsets.zero, // Menghilangkan padding default
-                    ),
-                    child: const Text(
-                      'Daftar',
+                  // Judul
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 15.0),
+                    child: Text(
+                      'Selamat datang di Taniku',
+                      textAlign: TextAlign.left,
                       style: TextStyle(
-                        color: Color(0xff000000), // Warna teks hitam
-                        fontSize: 20,
+                        fontFamily: 'Righteous',
+                        fontSize: 28,
+                        fontWeight: FontWeight.w300,
                       ),
                     ),
                   ),
-                )
-              ],
+                  const SizedBox(height: 10), // Spasi antara judul dan paragraf
+
+                  // Paragraf
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 15.0),
+                    child: Text(
+                      'Untuk melanjutkan aplikasi, silahkan Masuk jika sudah mempunyai akun dan Daftar untuk mendaftar akun baru.',
+                      textAlign: TextAlign.justify,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        fontFamily: 'Montserrat',
+                        color: Color(0xff000000),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                      height: 20), // Spasi antara paragraf dan tombol
+
+                  // Tombol Masuk
+                  SizedBox(
+                    width: 400,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginPage()),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xff00813E),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                      child: const Text(
+                        'Masuk',
+                        style: TextStyle(
+                          color: Color(0xffFFFFFF),
+                          fontSize: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 5), // Spasi antar tombol
+
+                  // Tombol Daftar
+                  SizedBox(
+                    width: 400,
+                    height: 50,
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const RegisterPage()),
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                      ),
+                      child: const Text(
+                        'Daftar',
+                        style: TextStyle(
+                          color: Color(0xff000000),
+                          fontSize: 20,
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
           ],
         ),

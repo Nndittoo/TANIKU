@@ -18,49 +18,47 @@ class _RegisterPageState extends State<RegisterPage> {
   final _password = TextEditingController();
   final _confirmPassword = TextEditingController();
 
-// proses jika diklik tombol daftar
+  @override
+  void dispose() {
+    _name.dispose();
+    _email.dispose();
+    _password.dispose();
+    _confirmPassword.dispose();
+    super.dispose();
+  }
+
   _register() async {
-    if (_email.text.isEmpty || _password.text.isEmpty || _name.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Tolong masukkan nama atau email atau password anda"),
-        ),
-      );
+    if (_name.text.isEmpty || _email.text.isEmpty || _password.text.isEmpty) {
+      _showSnackBar("Tolong masukkan nama, email, atau password Anda");
       return;
+    }
+    if (_password.text != _confirmPassword.text) {
+      _showSnackBar("Password tidak sama");
+      return;
+    }
+
+    final user =
+        await _auth.createUserWithEmailAndPassword(_email.text, _password.text);
+    if (user != null) {
+      log("User Create Successfully");
+      _showSnackBar("Registrasi berhasil");
+      goToHome(context);
     } else {
-      if (_password.text == _confirmPassword.text) {
-        final user = await _auth.createUserWithEmailAndPassword(
-            _email.text, _password.text);
-        if (user != null) {
-          log("User Create Successfully");
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Registrasi berhasil"),
-            ),
-          );
-          goToHome(context);
-        } else {
-          log("Registration failed");
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Registrasi gagal,"),
-            ),
-          );
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Password tidak sama"),
-          ),
-        );
-      }
+      log("Registration failed");
+      _showSnackBar("Registrasi gagal, coba lagi");
     }
   }
 
-  goToLogin(BuildContext context) => Navigator.push(
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  goToLogin(BuildContext context) => Navigator.pushReplacement(
       context, MaterialPageRoute(builder: (context) => const LoginPage()));
 
-  goToHome(BuildContext context) => Navigator.push(
+  goToHome(BuildContext context) => Navigator.pushReplacement(
       context, MaterialPageRoute(builder: (context) => const HomePage()));
 
   @override
@@ -83,201 +81,180 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             Center(
               child: SingleChildScrollView(
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'asset/img/logo-daun.png',
-                          width: 120,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'asset/img/logo-daun.png',
+                        width: 120,
+                      ),
+                      const Text(
+                        "Daftar",
+                        style: TextStyle(
+                          fontFamily: "Righteous",
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xff000000),
                         ),
-                        const Text(
-                          "Daftar",
-                          style: TextStyle(
-                            fontFamily: "Righteous",
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xff000000),
-                          ),
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 2,
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 20),
-                        Container(
-                          width: MediaQuery.of(context).size.width,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(15),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 2,
-                                blurRadius: 10,
-                                offset: const Offset(0, 3),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "Daftar Akun Baru",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xff00813E),
+                                ),
                               ),
+                              const SizedBox(height: 20),
+                              _buildTextField(_name, "Nama Lengkap"),
+                              const SizedBox(height: 20),
+                              _buildTextField(_email, "Email",
+                                  keyboardType: TextInputType.emailAddress),
+                              const SizedBox(height: 20),
+                              _buildTextField(_password, "Password",
+                                  obscureText: true),
+                              const SizedBox(height: 20),
+                              _buildTextField(
+                                  _confirmPassword, "Konfirmasi Password",
+                                  obscureText: true),
+                              const SizedBox(height: 20),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 50,
+                                child: ElevatedButton(
+                                  onPressed: _register,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xff00813E),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "Daftar",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ),
+                              )
                             ],
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  "Daftar Akun Baru",
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w400,
-                                    color: Color(0xff00813E),
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                TextField(
-                                  controller: _name,
-                                  decoration: InputDecoration(
-                                    labelText: "Nama Lengkap",
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                TextField(
-                                  controller: _email,
-                                  keyboardType: TextInputType.emailAddress,
-                                  decoration: InputDecoration(
-                                    labelText: "Email",
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                TextField(
-                                  controller: _password,
-                                  obscureText: true,
-                                  decoration: InputDecoration(
-                                    labelText: "Password",
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                TextField(
-                                  controller: _confirmPassword,
-                                  obscureText: true,
-                                  decoration: InputDecoration(
-                                    labelText: "Konfirmasi Password",
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 50,
-                                  child: ElevatedButton(
-                                    onPressed: _register,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xff00813E),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                    ),
-                                    child: const Text(
-                                      "Daftar",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              ],
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      const Row(
+                        children: [
+                          Expanded(
+                            child: Divider(
+                              color: Colors.grey,
+                              thickness: 1,
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 30),
-                        const Row(
-                          children: [
-                            Expanded(
-                              child: Divider(
-                                color: Colors.grey,
-                                thickness: 1,
-                              ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            child: Text(
+                              "Masuk dengan",
+                              style: TextStyle(color: Colors.grey),
                             ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 10),
-                              child: Text(
-                                "Masuk dengan",
-                                style: TextStyle(color: Colors.grey),
-                              ),
+                          ),
+                          Expanded(
+                            child: Divider(
+                              color: Colors.grey,
+                              thickness: 1,
                             ),
-                            Expanded(
-                              child: Divider(
-                                color: Colors.grey,
-                                thickness: 1,
-                              ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: () => goToHome(context),
+                            icon: Image.asset(
+                              'asset/img/facebook.png',
+                              width: 45,
                             ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            IconButton(
-                              onPressed: () => goToHome(context),
-                              icon: Image.asset(
-                                'asset/img/facebook.png',
-                                width: 45,
-                              ),
+                          ),
+                          const SizedBox(width: 20),
+                          IconButton(
+                            onPressed: () => goToHome(context),
+                            icon: Image.asset(
+                              "asset/img/google.png",
+                              width: 45,
                             ),
-                            const SizedBox(
-                              height: 20,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "Sudah punya akun?",
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 18,
                             ),
-                            IconButton(
-                              onPressed: () => goToHome(context),
-                              icon: Image.asset(
-                                "asset/img/google.png",
-                                width: 45,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              "Sudah punya akun?",
+                          ),
+                          GestureDetector(
+                            onTap: () => goToLogin(context),
+                            child: const Text(
+                              " Masuk",
                               style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 18,
+                                color: Color(0xff00813E),
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            GestureDetector(
-                              onTap: () => goToLogin(context),
-                              child: const Text(
-                                " Masuk",
-                                style: TextStyle(
-                                  color: Color(0xff00813E),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
+                          )
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String labelText,
+      {bool obscureText = false,
+      TextInputType keyboardType = TextInputType.text}) {
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        labelText: labelText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
         ),
       ),
     );
