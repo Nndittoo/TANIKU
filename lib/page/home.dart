@@ -3,6 +3,8 @@ import 'package:taniku/api/weather_service.dart';
 import 'package:intl/intl.dart';
 import 'package:taniku/helper/utils.dart';
 import 'package:taniku/page/profil.dart';
+import 'package:taniku/page/auth/auth_service.dart';
+import 'package:image_picker/image_picker.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -46,8 +48,12 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const ProfilePage()));
             },
-            icon: const CircleAvatar(
-              backgroundImage: AssetImage("asset/img/profil.jpg"),
+            icon: CircleAvatar(
+              backgroundImage: AuthService().user.photoURL != null &&
+                      AuthService().user.photoURL!.isNotEmpty
+                  ? NetworkImage(AuthService().user.photoURL!)
+                  : const AssetImage("asset/img/profile_default.png")
+                      as ImageProvider,
             ),
           ),
         ],
@@ -233,7 +239,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   );
                 } else {
-                  return const Center(child: Text('No data available'));
+                  return const Center(child: Text('Data tidak tersedia'));
                 }
               },
             ),
@@ -854,7 +860,7 @@ class CuacaPage extends StatefulWidget {
   const CuacaPage({super.key});
 
   @override
-  _CuacaPageState createState() => _CuacaPageState();
+  State<CuacaPage> createState() => _CuacaPageState();
 }
 
 class _CuacaPageState extends State<CuacaPage> {
@@ -876,113 +882,187 @@ class _CuacaPageState extends State<CuacaPage> {
   Widget build(BuildContext context) {
     String formattedDate = DateFormat('EEEE, dd MMM').format(DateTime.now());
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Judul dengan tombol "Location" dan icon
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  "Cuaca",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextButton.icon(
-                  onPressed: () {
-                    // Tindakan ketika tombol location ditekan
-                  },
-                  icon: const Icon(Icons.location_on),
-                  label: Text(cityName),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            // Tanggal yang akan ditampilkan secara dinamis
-            Center(
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  formattedDate, // Menampilkan tanggal yang sudah diformat
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            // Gambar cuaca di tengah
-            FutureBuilder<Map<String, dynamic>>(
-              future: fetchWeather(cityName), // Memanggil fetchWeather
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                      child: CircularProgressIndicator()); // Tampilkan loading
-                } else if (snapshot.hasError) {
-                  return Center(
-                      child: Text(
-                          'Error: ${snapshot.error}')); // Tampilkan error jika ada
-                } else if (snapshot.hasData) {
-                  var currentWeatherData = snapshot.data!['current'];
-                  var weatherCondition =
-                      currentWeatherData['weather'][0]['main'];
-                  String imagePath = getWeatherImage(weatherCondition);
-
-                  return Center(
-                    child: Column(
-                      children: [
-                        Image.asset(
-                          imagePath,
-                          height: 150,
-                          width: 150,
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          "${currentWeatherData['main']['temp']}°C",
-                          style: const TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          currentWeatherData['weather'][0]['description'],
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Judul dengan tombol "Location" dan icon
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Cuaca",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
-                  );
-                } else {
-                  return const Center(child: Text('No data available'));
-                }
-              },
-            ),
-            const SizedBox(height: 20),
-            // Judul Cuaca Minggu Ini
-            const Text(
-              "Prakiraan Cuaca Harian",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+                  ),
+                  TextButton.icon(
+                    onPressed: () {
+                      // Tindakan ketika tombol location ditekan
+                    },
+                    icon: const Icon(Icons.location_on),
+                    label: Text(cityName),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 10),
-            // Daftar cuaca
-            Expanded(
-              child: FutureBuilder<List<Map<String, dynamic>>?>(
+              const SizedBox(height: 20),
+              // Tanggal yang akan ditampilkan secara dinamis
+              Center(
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    formattedDate, // Menampilkan tanggal yang sudah diformat
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Gambar cuaca di tengah
+              FutureBuilder<Map<String, dynamic>>(
+                future: fetchWeather(cityName), // Memanggil fetchWeather
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                        child:
+                            CircularProgressIndicator()); // Tampilkan loading
+                  } else if (snapshot.hasError) {
+                    return Center(
+                        child: Text(
+                            'Error: ${snapshot.error}')); // Tampilkan error jika ada
+                  } else if (snapshot.hasData) {
+                    var currentWeatherData = snapshot.data!['current'];
+                    var weatherCondition =
+                        currentWeatherData['weather'][0]['main'];
+                    String imagePath = getWeatherImage(weatherCondition);
+
+                    return Center(
+                      child: Column(
+                        children: [
+                          Image.asset(
+                            imagePath,
+                            height: 150,
+                            width: 150,
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            "${currentWeatherData['main']['temp']}°C",
+                            style: const TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            currentWeatherData['weather'][0]['description'],
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    return const Center(child: Text('Data Tidak Tersedia'));
+                  }
+                },
+              ),
+              const SizedBox(height: 10),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.green, // Warna hijau
+                  borderRadius: BorderRadius.circular(8), // Sudut melengkung
+                ),
+                child: const Text(
+                  'Rekomendasi Tanaman',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white, // Warna teks putih
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 150,
+                child: FutureBuilder<Map<String, dynamic>>(
+                  future: fetchWeather(cityName), // Memanggil fetchWeather
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (snapshot.hasData) {
+                      var currentWeatherData = snapshot.data!['current'];
+                      var temperature = currentWeatherData['main']['temp'];
+                      var weatherCondition =
+                          currentWeatherData['weather'][0]['main'];
+
+                      // Rekomendasi tanaman berdasarkan suhu atau cuaca
+                      List<Map<String, String>> recommendations =
+                          getPlantRecommendations(
+                        temperature,
+                        weatherCondition,
+                      );
+
+                      return ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: recommendations.length,
+                        itemBuilder: (context, index) {
+                          var plant = recommendations[index];
+                          return Card(
+                            margin: const EdgeInsets.all(8.0),
+                            child: Column(
+                              children: [
+                                Image.asset(
+                                  plant['imagePath']!,
+                                  height: 80,
+                                  width: 80,
+                                  fit: BoxFit.cover,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  plant['name']!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    } else {
+                      return const Center(child: Text('Data Tidak Tersedia'));
+                    }
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 10),
+              // Judul Cuaca Minggu Ini
+              const Text(
+                "Prakiraan Cuaca Harian",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Daftar cuaca
+              FutureBuilder<List<Map<String, dynamic>>?>(
                 future: forecastWeather(cityName),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -995,6 +1075,9 @@ class _CuacaPageState extends State<CuacaPage> {
 
                   final forecasts = snapshot.data!;
                   return ListView.builder(
+                    shrinkWrap:
+                        true, // Agar ListView bekerja dengan SingleChildScrollView
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: forecasts.length,
                     itemBuilder: (context, index) {
                       final forecast = forecasts[index];
@@ -1042,8 +1125,8 @@ class _CuacaPageState extends State<CuacaPage> {
                   );
                 },
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -1058,15 +1141,14 @@ class SearchPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 1,
-        title: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Center(
-              child: Text("Pencarian"),
-            ),
-            Spacer(), // Spacer kedua untuk menjaga posisi teks tetap di tengah
-          ],
+        elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          "Pencarian",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       body: Padding(
@@ -1142,7 +1224,7 @@ class AddPostPage extends StatefulWidget {
   const AddPostPage({super.key});
 
   @override
-  _AddPostPageState createState() => _AddPostPageState();
+  State<AddPostPage> createState() => _AddPostPageState();
 }
 
 class _AddPostPageState extends State<AddPostPage> {
@@ -1170,6 +1252,17 @@ class _AddPostPageState extends State<AddPostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text("Post",
+            style: TextStyle(fontSize: 24, color: Colors.black)),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+      ),
       body: SingleChildScrollView(
         // Membungkus konten dalam SingleChildScrollView
         child: Padding(
@@ -1177,29 +1270,6 @@ class _AddPostPageState extends State<AddPostPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Tombol kembali dan judul
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(Icons.arrow_back, color: Colors.black),
-                  ),
-                ],
-              ),
-              const Center(
-                child: Text(
-                  "Post",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 5),
-              // Text Field untuk menulis postingan
               Container(
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(

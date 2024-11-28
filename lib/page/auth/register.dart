@@ -6,8 +6,9 @@ import 'package:taniku/page/home.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
+
   @override
-  _RegisterPageState createState() => _RegisterPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
 class _RegisterPageState extends State<RegisterPage> {
@@ -28,24 +29,46 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   _register() async {
+    // Validasi input
     if (_name.text.isEmpty || _email.text.isEmpty || _password.text.isEmpty) {
       _showSnackBar("Tolong masukkan nama, email, atau password Anda");
       return;
     }
+
     if (_password.text != _confirmPassword.text) {
       _showSnackBar("Password tidak sama");
       return;
     }
 
-    final user =
-        await _auth.createUserWithEmailAndPassword(_email.text, _password.text);
+    try {
+      // Registrasi pengguna
+      final user = await _auth.createUserWithEmailAndPassword(
+        _email.text.trim(),
+        _password.text,
+        _name.text.trim(),
+      );
+
+      if (user != null) {
+        log("User created successfully: ${user.email}");
+        _showSnackBar("Registrasi berhasil");
+        goToHome(context);
+      } else {
+        _showSnackBar("Registrasi gagal, coba lagi");
+      }
+    } catch (e) {
+      // Menangani error
+      log("Registration failed: $e");
+      _showSnackBar("Terjadi kesalahan: ${e.toString()}");
+    }
+  }
+
+  Future<void> _loginGoogle() async {
+    final user = await AuthService().signInWithGoogle();
     if (user != null) {
-      log("User Create Successfully");
-      _showSnackBar("Registrasi berhasil");
+      log("User logged in");
       goToHome(context);
     } else {
-      log("Registration failed");
-      _showSnackBar("Registrasi gagal, coba lagi");
+      _showSnackBar("Register gagal, coba lagi");
     }
   }
 
@@ -58,8 +81,10 @@ class _RegisterPageState extends State<RegisterPage> {
   goToLogin(BuildContext context) => Navigator.pushReplacement(
       context, MaterialPageRoute(builder: (context) => const LoginPage()));
 
-  goToHome(BuildContext context) => Navigator.pushReplacement(
-      context, MaterialPageRoute(builder: (context) => const HomePage()));
+  goToHome(BuildContext context) => Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const HomePage()),
+      (Route<dynamic> route) => false);
 
   @override
   Widget build(BuildContext context) {
@@ -193,15 +218,14 @@ class _RegisterPageState extends State<RegisterPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           IconButton(
-                            onPressed: () => goToHome(context),
+                            onPressed: () => {},
                             icon: Image.asset(
                               'asset/img/facebook.png',
                               width: 45,
                             ),
                           ),
-                          const SizedBox(width: 20),
                           IconButton(
-                            onPressed: () => goToHome(context),
+                            onPressed: _loginGoogle,
                             icon: Image.asset(
                               "asset/img/google.png",
                               width: 45,

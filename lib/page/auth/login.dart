@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:taniku/page/auth/register.dart';
-import 'package:taniku/page/home.dart';
 import 'dart:developer';
 import 'auth_service.dart';
+import 'package:taniku/page/home.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -16,32 +16,26 @@ class _LoginPageState extends State<LoginPage> {
   final _email = TextEditingController();
   final _password = TextEditingController();
 
-  goToRegister(BuildContext context) => Navigator.push(
-      context, MaterialPageRoute(builder: (context) => const RegisterPage()));
-
-  goToHome(BuildContext context) => Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const HomePage()),
-      (Route<dynamic> route) => false);
-
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
   }
 
-  @override
-  void dispose() {
-    _email.dispose();
-    _password.dispose();
-    super.dispose();
+  Future<void> _loginGoogle() async {
+    final user = await AuthService().signInWithGoogle();
+    if (user != null) {
+      log("User logged in");
+      goToHome(context);
+    } else {
+      _showSnackBar("Login gagal, coba lagi");
+    }
   }
 
   Future<void> _login() async {
     if (_email.text.isEmpty || _password.text.isEmpty) {
-      _showSnackBar("Tolong masukkan email atau password anda");
+      _showSnackBar("Tolong masukkan email atau password Anda");
       return;
     }
-
     final user =
         await auth.loginUserWithEmailAndPassword(_email.text, _password.text);
     if (user != null) {
@@ -55,14 +49,27 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void dispose() {
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
+  }
+
+  goToRegister(BuildContext context) => Navigator.pushReplacement(
+      context, MaterialPageRoute(builder: (context) => const RegisterPage()));
+  goToHome(BuildContext context) => Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const HomePage()),
+      (Route<dynamic> route) => false);
+
+  @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final size = MediaQuery.of(context).size;
 
     return Scaffold(
       body: SizedBox(
-        width: screenWidth,
-        height: screenHeight,
+        width: size.width,
+        height: size.height,
         child: Stack(
           children: [
             Positioned(
@@ -94,7 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 20),
                       Container(
-                        width: screenWidth,
+                        width: size.width,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(15),
@@ -188,14 +195,18 @@ class _LoginPageState extends State<LoginPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           IconButton(
-                            onPressed: () => goToHome(context),
-                            icon: Image.asset('asset/img/facebook.png',
-                                width: 45),
+                            onPressed: () => {},
+                            icon: Image.asset(
+                              'asset/img/facebook.png',
+                              width: 45,
+                            ),
                           ),
                           IconButton(
-                            onPressed: () => goToHome(context),
-                            icon:
-                                Image.asset("asset/img/google.png", width: 45),
+                            onPressed: _loginGoogle,
+                            icon: Image.asset(
+                              "asset/img/google.png",
+                              width: 45,
+                            ),
                           ),
                         ],
                       ),

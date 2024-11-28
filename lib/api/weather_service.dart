@@ -41,7 +41,7 @@ class WeatherService {
             .where((item) => item['dt_txt'].endsWith('12:00:00'))
             .map((item) => {
                   'date': item['dt_txt'],
-                  'temp': item['main']['temp'],
+                  'temp': item['main']['temp'].toInt(), // Membulatkan suhu
                   'weather': item['weather'][0]['description'],
                   'icon': item['weather'][0]['main'],
                 })
