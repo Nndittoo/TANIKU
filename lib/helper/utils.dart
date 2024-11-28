@@ -38,57 +38,81 @@ String getDayName(String date) {
 }
 
 List<Map<String, String>> getPlantRecommendations(
-    double temperature, String weather) {
+    double temperature, String weather, int humidity, double rainfall) {
+  // List untuk menyimpan rekomendasi tanaman
+  List<Map<String, String>> plantRecommendations = [];
+
+  // Fungsi untuk menambahkan item tanpa duplikat
+  void addRecommendation(Map<String, String> plant) {
+    // Cek apakah item sudah ada berdasarkan nama
+    if (!plantRecommendations
+        .any((existingPlant) => existingPlant['name'] == plant['name'])) {
+      plantRecommendations.add(plant);
+    }
+  }
+
+  // Menggunakan kondisi cuaca
   switch (weather.toLowerCase()) {
     case 'clear':
     case 'sunny':
       if (temperature > 30) {
-        return [
-          {'name': 'Semangka', 'imagePath': 'assets/images/watermelon.png'},
-          {'name': 'Melon', 'imagePath': 'assets/images/melon.png'},
-        ];
+        addRecommendation(
+            {'name': 'Semangka', 'imagePath': 'asset/img/semangka.png'});
+        addRecommendation(
+            {'name': 'Melon', 'imagePath': 'asset/img/melon.png'});
       } else if (temperature > 20) {
-        return [
-          {'name': 'Tomat', 'imagePath': 'assets/images/tomato.png'},
-          {'name': 'Paprika', 'imagePath': 'assets/images/pepper.png'},
-        ];
+        addRecommendation(
+            {'name': 'Tomat', 'imagePath': 'asset/img/tomat.png'});
       } else if (temperature > 10) {
-        return [
-          {'name': 'Wortel', 'imagePath': 'assets/images/carrot.png'},
-          {'name': 'Kentang', 'imagePath': 'assets/images/potato.png'},
-        ];
+        addRecommendation(
+            {'name': 'Wortel', 'imagePath': 'asset/img/wortel.png'});
+        addRecommendation(
+            {'name': 'Kentang', 'imagePath': 'asset/img/kentang.png'});
       } else {
-        return [
-          {'name': 'Kubis', 'imagePath': 'assets/images/cabbage.png'},
-          {'name': 'Selada', 'imagePath': 'assets/images/lettuce.png'},
-        ];
+        addRecommendation(
+            {'name': 'Kubis', 'imagePath': 'asset/img/kubis.png'});
+        addRecommendation(
+            {'name': 'Selada', 'imagePath': 'asset/img/selada.png'});
       }
+      break;
 
     case 'rain':
     case 'drizzle':
-      return [
-        {'name': 'Bayam', 'imagePath': 'asset/img/spinach.jpg'},
-        {'name': 'Sawi', 'imagePath': 'asset/img/mustard.png'},
-      ];
+      addRecommendation({'name': 'Bayam', 'imagePath': 'asset/img/bayam.png'});
+      addRecommendation({'name': 'Sawi', 'imagePath': 'asset/img/sawi.png'});
+      break;
 
     case 'clouds':
-      return [
-        {'name': 'Kubis', 'imagePath': 'assets/images/cabbage.png'},
-        {'name': 'Selada', 'imagePath': 'assets/images/lettuce.png'},
-      ];
-
-    case 'snow':
-      return [
-        {'name': 'Kentang', 'imagePath': 'assets/images/potato.png'},
-        {'name': 'Wortel', 'imagePath': 'assets/images/carrot.png'},
-      ];
+      addRecommendation({'name': 'Kubis', 'imagePath': 'asset/img/kubis.png'});
+      addRecommendation(
+          {'name': 'Selada', 'imagePath': 'asset/img/selada.png'});
+      break;
 
     default:
-      return [
-        {
-          'name': 'Tanaman Umum',
-          'imagePath': 'assets/images/default_plant.png'
-        },
-      ];
+      addRecommendation(
+          {'name': 'Tanaman Umum', 'imagePath': 'asset/img/default_plant.png'});
   }
+
+  // Logika berdasarkan kelembapan
+  if (humidity > 40 && humidity <= 70) {
+    addRecommendation({'name': 'Cabai', 'imagePath': 'asset/img/cabai.png'});
+    addRecommendation({'name': 'Tomat', 'imagePath': 'asset/img/tomat.png'});
+  } else {
+    addRecommendation({'name': 'Mangga', 'imagePath': 'asset/img/mangga.png'});
+    addRecommendation({'name': 'Jeruk', 'imagePath': 'asset/img/jeruk.png'});
+  }
+
+  // Logika berdasarkan curah hujan
+  if (rainfall > 1.0) {
+    addRecommendation({'name': 'Cabai', 'imagePath': 'asset/img/cabai.png'});
+    addRecommendation({'name': 'Tomat', 'imagePath': 'asset/img/tomat.png'});
+  } else if (rainfall > 0.5 && rainfall <= 1.0) {
+    addRecommendation({'name': 'Cabai', 'imagePath': 'asset/img/cabai.png'});
+    addRecommendation({'name': 'Tomat', 'imagePath': 'asset/img/tomat.png'});
+  } else {
+    addRecommendation({'name': 'Mangga', 'imagePath': 'asset/img/mangga.png'});
+    addRecommendation({'name': 'Jeruk', 'imagePath': 'asset/img/jeruk.png'});
+  }
+
+  return plantRecommendations;
 }

@@ -188,7 +188,7 @@ class _HomePageState extends State<HomePage> {
                                       color: Colors.white, fontSize: 20),
                                 ),
                                 Text(
-                                  '${currentWeatherData!['main']['temp']}°C',
+                                  '${currentWeatherData!['main']['temp'].toInt()}°C',
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 30),
                                 ),
@@ -937,9 +937,9 @@ class _CuacaPageState extends State<CuacaPage> {
                         child:
                             CircularProgressIndicator()); // Tampilkan loading
                   } else if (snapshot.hasError) {
-                    return Center(
+                    return const Center(
                         child: Text(
-                            'Error: ${snapshot.error}')); // Tampilkan error jika ada
+                            "Gagal Memuat Data")); // Tampilkan error jika ada
                   } else if (snapshot.hasData) {
                     var currentWeatherData = snapshot.data!['current'];
                     var weatherCondition =
@@ -956,7 +956,7 @@ class _CuacaPageState extends State<CuacaPage> {
                           ),
                           const SizedBox(height: 10),
                           Text(
-                            "${currentWeatherData['main']['temp']}°C",
+                            "${currentWeatherData['main']['temp'].toInt()}°C",
                             style: const TextStyle(
                               fontSize: 30,
                               fontWeight: FontWeight.bold,
@@ -1003,18 +1003,24 @@ class _CuacaPageState extends State<CuacaPage> {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
+                      return const Center(child: Text("Gagal Memuat Data"));
                     } else if (snapshot.hasData) {
                       var currentWeatherData = snapshot.data!['current'];
                       var temperature = currentWeatherData['main']['temp'];
                       var weatherCondition =
                           currentWeatherData['weather'][0]['main'];
+                      var humidity = currentWeatherData['main']['humidity'];
+                      var rainfall = currentWeatherData['rain'] != null
+                          ? currentWeatherData['rain']['1h']
+                          : 0.0;
 
                       // Rekomendasi tanaman berdasarkan suhu atau cuaca
                       List<Map<String, String>> recommendations =
                           getPlantRecommendations(
                         temperature,
                         weatherCondition,
+                        humidity,
+                        rainfall,
                       );
 
                       return ListView.builder(
@@ -1023,6 +1029,12 @@ class _CuacaPageState extends State<CuacaPage> {
                         itemBuilder: (context, index) {
                           var plant = recommendations[index];
                           return Card(
+                            color: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: const BorderSide(
+                                  color: Colors.black, width: 1),
+                            ),
                             margin: const EdgeInsets.all(8.0),
                             child: Column(
                               children: [
