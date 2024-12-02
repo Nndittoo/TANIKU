@@ -146,12 +146,86 @@ class _ProfilePageState extends State<ProfilePage> {
       {
         "icon": Icons.logout,
         "label": "Keluar",
-        "onPressed": () async {
-          await AuthService().signOut();
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const LoginPage()),
-            (route) => false,
+        "onPressed": () {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'asset/img/pintu.png', // Path ke gambar
+                    width: 153,
+                    height: 194,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Ohh tidak!! Anda akan keluar...',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Anda yakin?',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+              actions: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Tutup dialog
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: const Color(0xff00813E),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        'Tidak dong',
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        await AuthService().signOut();
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginPage()),
+                          (route) => false,
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        'Ya, Keluar',
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           );
         }
       },

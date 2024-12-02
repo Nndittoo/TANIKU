@@ -28,37 +28,33 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
-  _register() async {
+  Future<void> _register() async {
     // Validasi input
     if (_name.text.isEmpty || _email.text.isEmpty || _password.text.isEmpty) {
       _showSnackBar("Tolong masukkan nama, email, atau password Anda");
       return;
     }
-
     if (_password.text != _confirmPassword.text) {
       _showSnackBar("Password tidak sama");
       return;
     }
-
     try {
       // Registrasi pengguna
       final user = await _auth.createUserWithEmailAndPassword(
-        _email.text.trim(),
+        _email.text,
         _password.text,
-        _name.text.trim(),
+        _name.text,
       );
-
       if (user != null) {
-        log("User created successfully: ${user.email}");
-        _showSnackBar("Registrasi berhasil");
-        goToHome(context);
-      } else {
-        _showSnackBar("Registrasi gagal, coba lagi");
+        _showSnackBar("Registrasi berhasil. Selamat datang!");
+        goToHome(context); // Navigasi ke halaman berikutnya
       }
     } catch (e) {
-      // Menangani error
-      log("Registration failed: $e");
-      _showSnackBar("Terjadi kesalahan: ${e.toString()}");
+      if (e is Exception) {
+        _showSnackBar(e.toString().replaceFirst("Exception: ", ""));
+      } else {
+        _showSnackBar("Terjadi kesalahan tidak terduga.");
+      }
     }
   }
 

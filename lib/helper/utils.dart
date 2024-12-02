@@ -1,5 +1,4 @@
 import 'package:intl/intl.dart';
-import 'package:flutter/material.dart';
 
 String getWeatherImage(String input) {
   String assetPath = 'asset/img/';
@@ -90,7 +89,7 @@ List<Map<String, String>> getPlantRecommendations(
 
     default:
       addRecommendation(
-          {'name': 'Tanaman Umum', 'imagePath': 'asset/img/default_plant.png'});
+          {'name': 'Tidak ada', 'imagePath': 'asset/img/tidakada.png'});
   }
 
   // Logika berdasarkan kelembapan

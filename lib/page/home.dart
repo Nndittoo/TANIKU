@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:taniku/api/weather_service.dart';
 import 'package:intl/intl.dart';
 import 'package:taniku/helper/utils.dart';
+import 'package:taniku/page/notifikasi.dart';
 import 'package:taniku/page/profil.dart';
 import 'package:taniku/page/auth/auth_service.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:taniku/api/posting_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -38,7 +42,12 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const NotifikasiPage()));
+            },
             icon: const Icon(Icons.mark_email_unread_outlined),
             color: Colors.black87,
             iconSize: 32,
@@ -80,6 +89,7 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             FloatingActionButton(
+              heroTag: 'btnPost',
               onPressed: () {
                 Navigator.push(
                     context,
@@ -94,6 +104,7 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 10),
             FloatingActionButton(
+              heroTag: 'btnSearch',
               onPressed: () {
                 Navigator.push(
                     context,
@@ -133,14 +144,26 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  final String cityName = 'Medan';
   final WeatherService _weatherService = WeatherService();
 
-  Future<Map<String, dynamic>> fetchWeather(String cityName) async {
-    final currentData = await _weatherService.fetchWeatherData(cityName);
-    return {
-      'current': currentData,
-    };
+  late double lat;
+  late double lon;
+
+  // Fungsi untuk mendapatkan lokasi dan cuaca
+  Future<Map<String, dynamic>> fetchWeather() async {
+    try {
+      Position position = await _weatherService.getCurrentPosition();
+      lat = position.latitude;
+      lon = position.longitude;
+
+      final currentData =
+          await _weatherService.fetchWeatherDataByLocation(lat, lon);
+      return {
+        'current': currentData,
+      };
+    } catch (e) {
+      throw Exception('Gagal mendapatkan data cuaca: $e');
+    }
   }
 
   Widget buildMainContent(BuildContext context) {
@@ -153,17 +176,20 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 10),
             // Widget untuk menampilkan data cuaca
             FutureBuilder<Map<String, dynamic>>(
-              future: fetchWeather(cityName), // Memanggil fetchWeather
+              future: fetchWeather(), // Memanggil fetchWeather
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
                       child: CircularProgressIndicator()); // Tampilkan loading
                 } else if (snapshot.hasError) {
-                  return Center(
+                  return const Center(
                       child: Text(
-                          'Error: ${snapshot.error}')); // Tampilkan error jika ada
+                          'Gagal Memuat Data')); // Tampilkan error jika ada
                 } else if (snapshot.hasData) {
                   var currentWeatherData = snapshot.data!['current'];
+                  String cityName =
+                      currentWeatherData['name']; // Ambil nama kota dari data
+
                   return Container(
                     height: 200,
                     decoration: const BoxDecoration(
@@ -193,17 +219,18 @@ class _HomePageState extends State<HomePage> {
                                       color: Colors.white, fontSize: 30),
                                 ),
                                 Text(
-                                  '${currentWeatherData!['weather'][0]['description']}',
+                                  '${currentWeatherData['weather'][0]['description']}',
                                   style: const TextStyle(
                                       color: Colors.white, fontSize: 16),
                                 ),
                                 const SizedBox(height: 10),
                                 TextButton(
                                   onPressed: () {
-                                    // Pindah ke halaman CuacaPage (halaman kelima dalam PageView)
                                     setState(() {
-                                      _currentIndex = 4;
-                                      _pageController.jumpToPage(4);
+                                      _currentIndex =
+                                          4; // Indeks halaman 'CuacaPage'
+                                      _pageController.jumpToPage(
+                                          4); // Navigasi ke halaman 'CuacaPage'
                                     });
                                   },
                                   style: TextButton.styleFrom(
@@ -227,7 +254,7 @@ class _HomePageState extends State<HomePage> {
                               image: DecorationImage(
                                 image: AssetImage(
                                   getWeatherImage(
-                                    currentWeatherData!['weather'][0]['main'],
+                                    currentWeatherData['weather'][0]['main'],
                                   ),
                                 ),
                                 fit: BoxFit.contain,
@@ -258,10 +285,11 @@ class _HomePageState extends State<HomePage> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const MarketPricePage()));
+                    setState(() {
+                      _currentIndex = 1; // Indeks halaman 'MarketPricePage'
+                      _pageController.jumpToPage(
+                          1); // Navigasi ke halaman 'MarketPricePage'
+                    });
                   },
                   child: const Text(
                     "Selengkapnya",
@@ -304,7 +332,13 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    setState(() {
+                      _currentIndex = 2; // Indeks halaman 'MarketPricePage'
+                      _pageController.jumpToPage(
+                          2); // Navigasi ke halaman 'MarketPricePage'
+                    });
+                  },
                   child: const Text(
                     "Selengkapnya",
                     style: TextStyle(
@@ -571,7 +605,8 @@ class TutorialPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
+      body: SingleChildScrollView(
+        // Membungkus konten agar bisa di-scroll vertikal
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -642,7 +677,7 @@ class TutorialPage extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             // Card kecil pertama - latar belakang abu-abu
             _buildSmallCard("Judul Video 1", "Nama Penerbit",
                 "90K views • 1 minggu yang lalu",
@@ -864,18 +899,37 @@ class CuacaPage extends StatefulWidget {
 }
 
 class _CuacaPageState extends State<CuacaPage> {
-  final String cityName = 'Medan';
   final WeatherService _weatherService = WeatherService();
 
-  Future<Map<String, dynamic>> fetchWeather(String cityName) async {
-    final currentData = await _weatherService.fetchWeatherData(cityName);
-    return {
-      'current': currentData,
-    };
+  late double lat;
+  late double lon;
+
+  Future<Map<String, dynamic>> fetchWeather() async {
+    try {
+      Position position = await _weatherService.getCurrentPosition();
+      lat = position.latitude;
+      lon = position.longitude;
+
+      final currentData =
+          await _weatherService.fetchWeatherDataByLocation(lat, lon);
+      return {
+        'current': currentData,
+      };
+    } catch (e) {
+      throw Exception('Gagal mendapatkan data cuaca: $e');
+    }
   }
 
-  Future<List<Map<String, dynamic>>?> forecastWeather(String cityName) async {
-    return await _weatherService.fetchForecastData(cityName);
+  Future<List<Map<String, dynamic>>?> forecastWeather() async {
+    try {
+      Position position = await _weatherService.getCurrentPosition();
+      lat = position.latitude;
+      lon = position.longitude;
+
+      return await _weatherService.fetchForecastDataByLocation(lat, lon);
+    } catch (e) {
+      throw Exception('Gagal mendapatkan data forecast: $e');
+    }
   }
 
   @override
@@ -904,7 +958,7 @@ class _CuacaPageState extends State<CuacaPage> {
                       // Tindakan ketika tombol location ditekan
                     },
                     icon: const Icon(Icons.location_on),
-                    label: Text(cityName),
+                    label: const Text('Lokasi'),
                   ),
                 ],
               ),
@@ -915,7 +969,7 @@ class _CuacaPageState extends State<CuacaPage> {
                   padding:
                       const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   decoration: BoxDecoration(
-                    color: Colors.green,
+                    color: const Color(0xff00813E),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -930,7 +984,7 @@ class _CuacaPageState extends State<CuacaPage> {
               const SizedBox(height: 20),
               // Gambar cuaca di tengah
               FutureBuilder<Map<String, dynamic>>(
-                future: fetchWeather(cityName), // Memanggil fetchWeather
+                future: fetchWeather(), // Memanggil fetchWeather
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -954,21 +1008,18 @@ class _CuacaPageState extends State<CuacaPage> {
                             height: 150,
                             width: 150,
                           ),
-                          const SizedBox(height: 10),
                           Text(
                             "${currentWeatherData['main']['temp'].toInt()}°C",
                             style: const TextStyle(
                               fontSize: 30,
                               fontWeight: FontWeight.bold,
+                              color: Color(0xff00813E),
                             ),
                           ),
-                          const SizedBox(height: 5),
                           Text(
                             currentWeatherData['weather'][0]['description'],
                             style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey,
-                            ),
+                                fontSize: 26, color: Colors.grey),
                           ),
                         ],
                       ),
@@ -983,7 +1034,8 @@ class _CuacaPageState extends State<CuacaPage> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.green, // Warna hijau
+                  color: const Color(0xff00813E),
+                  // Warna hijau
                   borderRadius: BorderRadius.circular(8), // Sudut melengkung
                 ),
                 child: const Text(
@@ -998,7 +1050,7 @@ class _CuacaPageState extends State<CuacaPage> {
               SizedBox(
                 height: 150,
                 child: FutureBuilder<Map<String, dynamic>>(
-                  future: fetchWeather(cityName), // Memanggil fetchWeather
+                  future: fetchWeather(), // Memanggil fetchWeather
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
@@ -1075,7 +1127,7 @@ class _CuacaPageState extends State<CuacaPage> {
               const SizedBox(height: 10),
               // Daftar cuaca
               FutureBuilder<List<Map<String, dynamic>>?>(
-                future: forecastWeather(cityName),
+                future: forecastWeather(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());

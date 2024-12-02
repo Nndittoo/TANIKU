@@ -36,15 +36,20 @@ class _LoginPageState extends State<LoginPage> {
       _showSnackBar("Tolong masukkan email atau password Anda");
       return;
     }
-    final user =
-        await auth.loginUserWithEmailAndPassword(_email.text, _password.text);
-    if (user != null) {
-      log("User logged in");
-      _showSnackBar("Login berhasil");
-      goToHome(context);
-    } else {
-      log("Login failed");
-      _showSnackBar("Login gagal, coba lagi");
+    try {
+      final user =
+          await auth.loginUserWithEmailAndPassword(_email.text, _password.text);
+      if (user != null) {
+        log("User logged in");
+        _showSnackBar("Login berhasil");
+        goToHome(context);
+      }
+    } catch (e) {
+      if (e is Exception) {
+        _showSnackBar(e.toString().replaceFirst("Exception: ", ""));
+      } else {
+        _showSnackBar("Terjadi kesalahan tidak terduga.");
+      }
     }
   }
 

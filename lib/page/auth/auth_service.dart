@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -42,26 +41,31 @@ class AuthService {
       // Memperbarui profil pengguna untuk menambahkan nama
       if (cred.user != null) {
         await cred.user!.updateDisplayName(name);
-        await cred.user!
-            .reload(); // Memuat ulang data pengguna untuk mendapatkan nama yang diperbarui
+        await cred.user!.reload(); // Memuat ulang data pengguna
       }
       return _auth.currentUser; // Mengembalikan user yang telah diperbarui
-    } catch (e) {
-      if (e is FirebaseAuthException) {
-        if (e.code == 'email-already-in-use') {
-          ("Email sudah digunakan");
-        }
-        if (e.code == 'weak-password') {
-          ("Password terlalu lemah");
-        }
-        if (e.code == 'invalid-email') {
-          ("Email tidak valid");
-        }
-      } else {
-        log("Error during registration: $e");
+    } on FirebaseAuthException catch (e) {
+      // Tangkap kode error FirebaseAuthException
+      switch (e.code) {
+        case 'email-already-in-use':
+          log("Email sudah digunakan");
+          throw Exception("Email sudah digunakan. Gunakan email lain.");
+        case 'weak-password':
+          log("Password terlalu lemah");
+          throw Exception(
+              "Password terlalu lemah. Gunakan password yang lebih kuat.");
+        case 'invalid-email':
+          log("Email tidak valid");
+          throw Exception("Format email tidak valid.");
+        default:
+          log("Error: ${e.code}");
+          throw Exception("Terjadi kesalahan, coba lagi.");
       }
+    } catch (e) {
+      // Tangkap error lain
+      log("Error during registration: $e");
+      throw Exception("Terjadi kesalahan tidak terduga.");
     }
-    return null;
   }
 
   Future<User?> loginUserWithEmailAndPassword(
@@ -70,15 +74,32 @@ class AuthService {
       final cred = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       return cred.user;
+    } on FirebaseAuthException catch (e) {
+      // Tangkap kode error FirebaseAuthException
+      switch (e.code) {
+        case 'user-not-found':
+          log("Email tidak ditemukan");
+          throw Exception(
+              "Email tidak ditemukan. Silakan daftar terlebih dahulu.");
+        case 'wrong-password':
+          log("Password salah");
+          throw Exception("Password salah. Silakan coba lagi.");
+        case 'invalid-email':
+          log("Email tidak valid");
+          throw Exception("Format email tidak valid.");
+        default:
+          log("Error: ${e.code}");
+          throw Exception("Terjadi kesalahan, coba lagi.");
+      }
     } catch (e) {
-      log("Eror during login: $e ");
+      // Tangkap error lain
+      log("Error during registration: $e");
+      throw Exception("Terjadi kesalahan tidak terduga.");
     }
-    return null;
   }
 
   Future<void> signOut() async {
     await _auth.signOut();
     await GoogleSignIn().signOut();
-    // await FacebookAuth.instance.logOut();
   }
 }
