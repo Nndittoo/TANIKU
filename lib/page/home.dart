@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:taniku/api/weather_service.dart';
 import 'package:intl/intl.dart';
 import 'package:taniku/helper/utils.dart';
+import 'package:taniku/page/marketprice_detail.dart';
 import 'package:taniku/page/notifikasi.dart';
+import 'package:taniku/page/obat_detail.dart';
 import 'package:taniku/page/profil.dart';
 import 'package:taniku/page/auth/auth_service.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'package:taniku/api/posting_service.dart';
+import 'package:taniku/page/tutorial_detail.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -197,7 +197,7 @@ class _HomePageState extends State<HomePage> {
                         image: AssetImage("asset/img/bg-cuaca.png"),
                         fit: BoxFit.cover,
                       ),
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                      borderRadius: BorderRadius.all(Radius.circular(18)),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -294,7 +294,9 @@ class _HomePageState extends State<HomePage> {
                   child: const Text(
                     "Selengkapnya",
                     style: TextStyle(
-                      color: Colors.green,
+                      color: Color(0xff00813E),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
@@ -306,15 +308,15 @@ class _HomePageState extends State<HomePage> {
                 scrollDirection: Axis.horizontal,
                 children: const [
                   FruitCardH(
-                      name: 'Apple',
+                      name: 'Semangka',
                       price: 'Rp 10.000/kg',
-                      imagePath: 'asset/img/jeruk.png'),
+                      imagePath: 'asset/img/semangka.png'),
                   FruitCardH(
-                      name: 'Orange',
+                      name: 'Jeruk',
                       price: 'Rp 15.000/kg',
                       imagePath: 'asset/img/jeruk.png'),
                   FruitCardH(
-                      name: 'Banana',
+                      name: 'Jeruk',
                       price: 'Rp 8.000/kg',
                       imagePath: 'asset/img/jeruk.png'),
                 ],
@@ -325,7 +327,7 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  "Posting",
+                  "Tutorial Bertani",
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -342,7 +344,9 @@ class _HomePageState extends State<HomePage> {
                   child: const Text(
                     "Selengkapnya",
                     style: TextStyle(
-                      color: Colors.green,
+                      color: Color(0xff00813E),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
@@ -486,7 +490,13 @@ class FruitCard extends StatelessWidget {
       width: 130,
       child: InkWell(
         onTap: () {
-          // Action when the card is pressed
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return MarketPriceDetailPage(
+              name: name,
+              price: price,
+              imagePath: imagePath,
+            );
+          }));
         },
         child: Card(
           color: Colors.white, // Latar belakang putih
@@ -510,25 +520,25 @@ class FruitCard extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
                 const SizedBox(height: 8), // Spasi antara gambar dan teks
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Colors.black87,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  price,
-                  style: TextStyle(
-                    color: Colors.green[800],
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      price,
+                      style: const TextStyle(
+                        color: Color(0xff00813E),
+                        fontSize: 14,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                )
               ],
             ),
           ),
@@ -553,49 +563,60 @@ class FruitCardH extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 300,
-      width: 150,
-      child: Card(
-        color: Colors.white, // Latar belakang putih
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12), // Radius card
-          side:
-              const BorderSide(color: Colors.black, width: .3), // Border hitam
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(5.0), // Padding 10 di setiap sisi
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.asset(
-                imagePath,
-                width: 75, // Lebar gambar agar proporsional
-                fit: BoxFit.cover,
-              ),
-              const SizedBox(height: 8), // Spasi antara gambar dan teks
-              Column(
+        height: 155,
+        width: 130,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return MarketPriceDetailPage(
+                name: name,
+                price: price,
+                imagePath: imagePath,
+              );
+            }));
+          },
+          child: Card(
+            color: Colors.white, // Latar belakang putih
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12), // Radius card
+              side: const BorderSide(
+                  color: Colors.black, width: .3), // Border hitam
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(5.0), // Padding 10 di setiap sisi
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    name,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16),
-                    textAlign: TextAlign.center,
+                  Image.asset(
+                    imagePath,
+                    width: 75, // Lebar gambar agar proporsional
+                    fit: BoxFit.cover,
                   ),
-                  Text(
-                    price,
-                    style: const TextStyle(
-                      color: Color(0xff00813E),
-                      fontSize: 14,
-                    ),
-                    textAlign: TextAlign.center,
+                  const SizedBox(height: 8), // Spasi antara gambar dan teks
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        price,
+                        style: const TextStyle(
+                          color: Color(0xff00813E),
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }
 
@@ -624,70 +645,84 @@ class TutorialPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             // Card besar - video utama
-            Card(
-              color: Colors.white, // Latar belakang putih untuk Card besar
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Video Thumbnail
-                  Image.asset(
-                    "asset/img/post.png",
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.all(12.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CircleAvatar(
-                          backgroundImage: AssetImage("asset/img/profil.jpg"),
-                          radius: 20,
-                        ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Judul Video Utama",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                "Nama Penerbit",
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                              Text(
-                                "120K views • 2 hari yang lalu",
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+            InkWell(
+              onTap: () {
+                // Navigasi ke TutorialDetailPage
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TutorialDetailPage(
+                      title: "Judul Video Utama",
+                      publisher: "Nama Penerbit",
                     ),
                   ),
-                ],
+                );
+              },
+              child: Card(
+                color: Colors.white, // Latar belakang putih untuk Card besar
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Video Thumbnail
+                    Image.asset(
+                      "asset/img/post.png",
+                      height: 200,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.all(12.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: AssetImage("asset/img/profil.jpg"),
+                            radius: 20,
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Judul Video Utama",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  "Nama Penerbit",
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                                Text(
+                                  "120K views • 2 hari yang lalu",
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 10),
             // Card kecil pertama - latar belakang abu-abu
-            _buildSmallCard("Judul Video 1", "Nama Penerbit",
+            _buildSmallCard(context, "Judul Video 1", "Nama Penerbit",
                 "90K views • 1 minggu yang lalu",
                 isGreyBackground: true),
             // Card kecil kedua - latar belakang putih
-            _buildSmallCard("Judul Video 2", "Nama Penerbit",
+            _buildSmallCard(context, "Judul Video 2", "Nama Penerbit",
                 "80K views • 3 hari yang lalu",
                 isGreyBackground: false),
             // Card kecil ketiga - latar belakang abu-abu
-            _buildSmallCard("Judul Video 3", "Nama Penerbit",
+            _buildSmallCard(context, "Judul Video 3", "Nama Penerbit",
                 "70K views • 5 hari yang lalu",
                 isGreyBackground: true),
           ],
@@ -697,55 +732,70 @@ class TutorialPage extends StatelessWidget {
   }
 
   // Widget untuk membangun Card kecil dengan parameter latar belakang
-  Widget _buildSmallCard(String title, String publisher, String views,
+  Widget _buildSmallCard(
+      BuildContext context, String title, String publisher, String views,
       {required bool isGreyBackground}) {
-    return Card(
-      color: isGreyBackground ? Colors.grey[200] : Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.asset(
-              "asset/img/post.png",
-              width: 120,
-              height: 70,
-              fit: BoxFit.cover,
+    return InkWell(
+      onTap: () {
+        // Navigasi ke TutorialDetailPage
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TutorialDetailPage(
+              title: title,
+              publisher: publisher,
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      const CircleAvatar(
-                        backgroundImage: AssetImage("asset/img/profil.jpg"),
-                        radius: 12,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(publisher),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    views,
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-                ],
+          ),
+        );
+      },
+      child: Card(
+        color: isGreyBackground ? Colors.grey[200] : Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.asset(
+                "asset/img/post.png",
+                width: 120,
+                height: 70,
+                fit: BoxFit.cover,
               ),
-            ),
-          ],
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        const CircleAvatar(
+                          backgroundImage: AssetImage("asset/img/profil.jpg"),
+                          radius: 12,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(publisher),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      views,
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -845,47 +895,61 @@ class ObatPage extends StatelessWidget {
       itemCount: 6, // Jumlah card sebagai contoh
       itemBuilder: (context, index) {
         bool isOdd = index % 2 == 0;
-        return Card(
-          color: isOdd ? Colors.grey[200] : Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Image.asset(
-                  "asset/img/post.png",
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Judul Obat $type ${index + 1}",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "Deskripsi singkat tentang obat jenis $type. "
-                        "Obat ini digunakan untuk mengatasi masalah tertentu.",
-                        style: const TextStyle(color: Colors.grey),
-                      ),
-                    ],
+        return InkWell(
+            onTap: () {
+              // Navigasi ke TutorialDetailPage
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ObatDetailPage(
+                    name: "Judul Obat $type ${index + 1}",
+                    price: "Rp 10.000",
+                    imagePath: "asset/img/post.png",
                   ),
                 ),
-              ],
-            ),
-          ),
-        );
+              );
+            },
+            child: Card(
+              color: isOdd ? Colors.grey[200] : Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Image.asset(
+                      "asset/img/post.png",
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Judul Obat $type ${index + 1}",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Deskripsi singkat tentang obat jenis $type. "
+                            "Obat ini digunakan untuk mengatasi masalah tertentu.",
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ));
       },
     );
   }
