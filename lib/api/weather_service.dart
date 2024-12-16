@@ -87,7 +87,6 @@ class WeatherService {
     }
 
     // Get the current position
-    return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+    return await Geolocator.getCurrentPosition();
   }
 }

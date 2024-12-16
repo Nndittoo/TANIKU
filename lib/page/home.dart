@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:taniku/api/weather_service.dart';
 import 'package:intl/intl.dart';
@@ -9,6 +11,10 @@ import 'package:taniku/page/profil.dart';
 import 'package:taniku/page/auth/auth_service.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:taniku/page/tutorial_detail.dart';
+import 'package:taniku/models/tutorial_model.dart';
+import 'package:taniku/models/obat_model.dart';
+import 'package:taniku/models/marketprice_model.dart';
+import 'package:taniku/api/api_taniku.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -145,7 +151,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   final WeatherService _weatherService = WeatherService();
-
+  final ApiService apiService = ApiService();
   late double lat;
   late double lon;
 
@@ -175,31 +181,32 @@ class _HomePageState extends State<HomePage> {
           children: [
             const SizedBox(height: 10),
             // Widget untuk menampilkan data cuaca
-            FutureBuilder<Map<String, dynamic>>(
-              future: fetchWeather(), // Memanggil fetchWeather
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                      child: CircularProgressIndicator()); // Tampilkan loading
-                } else if (snapshot.hasError) {
-                  return const Center(
-                      child: Text(
-                          'Gagal Memuat Data')); // Tampilkan error jika ada
-                } else if (snapshot.hasData) {
-                  var currentWeatherData = snapshot.data!['current'];
-                  String cityName =
-                      currentWeatherData['name']; // Ambil nama kota dari data
+            Container(
+              height: 200,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("asset/img/bg-cuaca.png"),
+                  fit: BoxFit.cover,
+                ),
+                borderRadius: BorderRadius.all(Radius.circular(18)),
+              ),
+              child: FutureBuilder<Map<String, dynamic>>(
+                future: fetchWeather(), // Memanggil fetchWeather
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                        child:
+                            CircularProgressIndicator()); // Tampilkan loading
+                  } else if (snapshot.hasError) {
+                    return const Center(
+                        child: Text(
+                            'Gagal Memuat Data')); // Tampilkan error jika ada
+                  } else if (snapshot.hasData) {
+                    var currentWeatherData = snapshot.data!['current'];
+                    String cityName =
+                        currentWeatherData['name']; // Ambil nama kota dari data
 
-                  return Container(
-                    height: 200,
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage("asset/img/bg-cuaca.png"),
-                        fit: BoxFit.cover,
-                      ),
-                      borderRadius: BorderRadius.all(Radius.circular(18)),
-                    ),
-                    child: Padding(
+                    return Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Row(
                         children: [
@@ -211,17 +218,30 @@ class _HomePageState extends State<HomePage> {
                                 Text(
                                   cityName,
                                   style: const TextStyle(
-                                      color: Colors.white, fontSize: 20),
+                                    fontFamily: 'Montserrat',
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 Text(
                                   '${currentWeatherData!['main']['temp'].toInt()}°C',
                                   style: const TextStyle(
-                                      color: Colors.white, fontSize: 30),
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    fontSize: 36,
+                                    fontFamily: 'Montserrat',
+                                  ),
                                 ),
                                 Text(
                                   '${currentWeatherData['weather'][0]['description']}',
                                   style: const TextStyle(
-                                      color: Colors.white, fontSize: 16),
+                                    fontFamily: 'Montserrat',
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                  softWrap: true,
                                 ),
                                 const SizedBox(height: 10),
                                 TextButton(
@@ -263,12 +283,12 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ],
                       ),
-                    ),
-                  );
-                } else {
-                  return const Center(child: Text('Data tidak tersedia'));
-                }
-              },
+                    );
+                  } else {
+                    return const Center(child: Text('Data tidak tersedia'));
+                  }
+                },
+              ),
             ),
 
             //akhir dari widget cuaca
@@ -279,8 +299,9 @@ class _HomePageState extends State<HomePage> {
                 const Text(
                   "Harga Pasar",
                   style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'Righteous',
                   ),
                 ),
                 TextButton(
@@ -292,35 +313,45 @@ class _HomePageState extends State<HomePage> {
                     });
                   },
                   child: const Text(
-                    "Selengkapnya",
+                    "Selengkapnya >",
                     style: TextStyle(
                       color: Color(0xff00813E),
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'Montserrat',
                     ),
                   ),
                 ),
               ],
             ),
-            SizedBox(
-              height: 150,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: const [
-                  FruitCardH(
-                      name: 'Semangka',
-                      price: 'Rp 10.000/kg',
-                      imagePath: 'asset/img/semangka.png'),
-                  FruitCardH(
-                      name: 'Jeruk',
-                      price: 'Rp 15.000/kg',
-                      imagePath: 'asset/img/jeruk.png'),
-                  FruitCardH(
-                      name: 'Jeruk',
-                      price: 'Rp 8.000/kg',
-                      imagePath: 'asset/img/jeruk.png'),
-                ],
-              ),
+            FutureBuilder<List<MarketPrice>>(
+              future: apiService.getMarket(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No market prices found'));
+                } else {
+                  final marketPrices = snapshot.data!;
+                  return SizedBox(
+                    height: 145,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: marketPrices.length,
+                      itemBuilder: (context, index) {
+                        final marketPrice = marketPrices[index];
+                        return FruitCardH(
+                          id: marketPrice.id,
+                          name: marketPrice.namaBuah,
+                          imagePath: marketPrice.potoBuah,
+                        );
+                      },
+                    ),
+                  );
+                }
+              },
             ),
             const SizedBox(height: 20),
             Row(
@@ -329,51 +360,119 @@ class _HomePageState extends State<HomePage> {
                 const Text(
                   "Tutorial Bertani",
                   style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'Righteous',
                   ),
                 ),
                 TextButton(
                   onPressed: () {
                     setState(() {
-                      _currentIndex = 2; // Indeks halaman 'MarketPricePage'
-                      _pageController.jumpToPage(
-                          2); // Navigasi ke halaman 'MarketPricePage'
+                      _currentIndex = 2;
+                      _pageController.jumpToPage(2);
                     });
                   },
                   child: const Text(
-                    "Selengkapnya",
+                    "Selengkapnya >",
                     style: TextStyle(
                       color: Color(0xff00813E),
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'Montserrat',
                     ),
                   ),
                 ),
               ],
             ),
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Image.asset(
-                    "asset/img/post.png",
-                    height: 180,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.all(12.0),
-                    child: Text(
-                      "Deskripsi postingan...",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ],
-              ),
+            FutureBuilder<List<Tutorial>>(
+              future: apiService.getTutorials(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return const Center(child: Text('Gagal Memuat Data'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('Tutorial Tidak Ditemukan'));
+                } else {
+                  final tutorials = snapshot.data!;
+                  final latestTutorials = tutorials
+                      .take(2)
+                      .toList(); // Mengambil dua tutorial terbaru
+                  return Column(
+                    children: latestTutorials.map((tutorial) {
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TutorialDetailPage(
+                                title: tutorial.judul,
+                                publisher: tutorial.creator,
+                                description: tutorial.deskripsi,
+                                imageUrl: tutorial.photoCreator,
+                                videoUrl: tutorial.video,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Card(
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Image.network(
+                                tutorial.photoCreator,
+                                height: 180,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage:
+                                          NetworkImage(tutorial.photoCreator),
+                                      radius: 28,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            tutorial.judul,
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            tutorial.creator,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  );
+                }
+              },
             ),
           ],
         ),
@@ -387,6 +486,7 @@ class MarketPricePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ApiService apiService = ApiService();
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -394,52 +494,61 @@ class MarketPricePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header dengan tombol sortir
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   "Harga Pasar",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'Righteous',
+                  ),
                 ),
-                TextButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.sort, color: Color(0xff00813E)),
-                    label: const Text(
-                      "Sortir",
-                      style: TextStyle(color: Color(0xff00813E)),
-                    )),
               ],
             ),
             const SizedBox(height: 10),
             // Daftar fruit card
             Expanded(
-              child: ListView.builder(
-                itemCount: 4,
-                itemBuilder: (context, rowIndex) {
-                  return Container(
-                    color: rowIndex.isEven
-                        ? Colors.white
-                        : Colors
-                            .grey[200], // Latar belakang baris ganjil dan genap
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        FruitCard(
-                            name: 'Bawang Putih',
-                            price: 'Rp 10.000/kg',
-                            imagePath: 'asset/img/jeruk.png'),
-                        FruitCard(
-                            name: 'Orange',
-                            price: 'Rp 15.000/kg',
-                            imagePath: 'asset/img/jeruk.png'),
-                        FruitCard(
-                            name: 'Banana',
-                            price: 'Rp 8.000/kg',
-                            imagePath: 'asset/img/jeruk.png'),
-                      ],
-                    ),
-                  );
+              child: FutureBuilder<List<MarketPrice>>(
+                future: apiService.getMarket(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text('No market prices found'));
+                  } else {
+                    final marketPrices = snapshot.data!;
+                    return ListView.builder(
+                      itemCount: (marketPrices.length / 3).ceil(),
+                      itemBuilder: (context, rowIndex) {
+                        final startIndex = rowIndex * 3;
+                        final endIndex =
+                            (startIndex + 3).clamp(0, marketPrices.length);
+                        final rowItems =
+                            marketPrices.sublist(startIndex, endIndex);
+                        return Container(
+                          color: rowIndex.isEven
+                              ? Colors.white
+                              : Colors.grey[
+                                  200], // Latar belakang baris ganjil dan genap
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: rowItems.map((marketPrice) {
+                              return FruitCardH(
+                                id: marketPrice.id,
+                                name: marketPrice.namaBuah,
+                                imagePath: marketPrice.potoBuah,
+                              );
+                            }).toList(),
+                          ),
+                        );
+                      },
+                    );
+                  }
                 },
               ),
             ),
@@ -473,14 +582,14 @@ class MarketPricePage extends StatelessWidget {
 
 class FruitCard extends StatelessWidget {
   final String name;
-  final String price;
   final String imagePath;
+  final int id;
 
   const FruitCard({
     super.key,
     required this.name,
-    required this.price,
     required this.imagePath,
+    required this.id,
   });
 
   @override
@@ -492,8 +601,8 @@ class FruitCard extends StatelessWidget {
         onTap: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
             return MarketPriceDetailPage(
+              id: id,
               name: name,
-              price: price,
               imagePath: imagePath,
             );
           }));
@@ -513,11 +622,17 @@ class FruitCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Image.asset(
+                Image.network(
                   imagePath,
-                  width: 70, // Lebar gambar agar proporsional
-                  height: 70,
+                  width: 75, // Lebar gambar agar proporsional
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(Icons.error);
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return const Center(child: CircularProgressIndicator());
+                  },
                 ),
                 const SizedBox(height: 8), // Spasi antara gambar dan teks
                 Column(
@@ -527,15 +642,7 @@ class FruitCard extends StatelessWidget {
                       name,
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 16),
-                      textAlign: TextAlign.center,
-                    ),
-                    Text(
-                      price,
-                      style: const TextStyle(
-                        color: Color(0xff00813E),
-                        fontSize: 14,
-                      ),
-                      textAlign: TextAlign.center,
+                      textAlign: TextAlign.start,
                     ),
                   ],
                 )
@@ -550,73 +657,76 @@ class FruitCard extends StatelessWidget {
 
 class FruitCardH extends StatelessWidget {
   final String name;
-  final String price;
   final String imagePath;
+  final int id;
 
   const FruitCardH({
     super.key,
     required this.name,
-    required this.price,
     required this.imagePath,
+    required this.id,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        height: 155,
-        width: 130,
-        child: InkWell(
-          onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return MarketPriceDetailPage(
-                name: name,
-                price: price,
-                imagePath: imagePath,
-              );
-            }));
-          },
-          child: Card(
-            color: Colors.white, // Latar belakang putih
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12), // Radius card
-              side: const BorderSide(
-                  color: Colors.black, width: .3), // Border hitam
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(5.0), // Padding 10 di setiap sisi
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    imagePath,
-                    width: 75, // Lebar gambar agar proporsional
-                    fit: BoxFit.cover,
-                  ),
-                  const SizedBox(height: 8), // Spasi antara gambar dan teks
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        name,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
-                        textAlign: TextAlign.center,
+      height: 155,
+      width: 130,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return MarketPriceDetailPage(
+              id: id,
+              name: name,
+              imagePath: imagePath,
+            );
+          }));
+        },
+        child: Card(
+          color: Colors.white, // Latar belakang putih
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12), // Radius card
+            side: const BorderSide(
+                color: Colors.black, width: .3), // Border hitam
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(5.0), // Padding 10 di setiap sisi
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Image.network(
+                  imagePath,
+                  width: 75, // Lebar gambar agar proporsional
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(Icons.error);
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                ),
+                const SizedBox(height: 8), // Spasi antara gambar dan teks
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 20,
+                        fontFamily: 'Montserrat',
                       ),
-                      Text(
-                        price,
-                        style: const TextStyle(
-                          color: Color(0xff00813E),
-                          fontSize: 14,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                      textAlign: TextAlign.start,
+                    ),
+                  ],
+                )
+              ],
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 }
 
@@ -625,9 +735,10 @@ class TutorialPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ApiService apiService = ApiService();
+
     return Scaffold(
       body: SingleChildScrollView(
-        // Membungkus konten agar bisa di-scroll vertikal
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -637,113 +748,132 @@ class TutorialPage extends StatelessWidget {
                 Text(
                   "Tutorial",
                   style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'Righteous',
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 20),
-            // Card besar - video utama
-            InkWell(
-              onTap: () {
-                // Navigasi ke TutorialDetailPage
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const TutorialDetailPage(
-                      title: "Judul Video Utama",
-                      publisher: "Nama Penerbit",
-                    ),
-                  ),
-                );
-              },
-              child: Card(
-                color: Colors.white, // Latar belakang putih untuk Card besar
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Video Thumbnail
-                    Image.asset(
-                      "asset/img/post.png",
-                      height: 200,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.all(12.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CircleAvatar(
-                            backgroundImage: AssetImage("asset/img/profil.jpg"),
-                            radius: 20,
-                          ),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Judul Video Utama",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  "Nama Penerbit",
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                                Text(
-                                  "120K views • 2 hari yang lalu",
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                              ],
+            FutureBuilder<List<Tutorial>>(
+              future: apiService.getTutorials(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return const Center(child: Text('Gagal Memuat Data'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('Tutorial Tidak Ditemukan'));
+                } else {
+                  final tutorials = snapshot.data!;
+                  return Column(
+                    children: [
+                      // Card besar - video utama
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TutorialDetailPage(
+                                title: tutorials[0].judul,
+                                publisher: tutorials[0].creator,
+                                description: tutorials[0].deskripsi,
+                                imageUrl: tutorials[0].photoCreator,
+                                videoUrl: tutorials[0].video,
+                              ),
                             ),
+                          );
+                        },
+                        child: Card(
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        ],
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Image.network(
+                                tutorials[0].photoCreator,
+                                height: 200,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                          tutorials[0].photoCreator),
+                                      radius: 20,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            tutorials[0].judul,
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            tutorials[0].creator,
+                                            style: const TextStyle(
+                                                color: Colors.grey),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
+                      const SizedBox(height: 10),
+                      // Card kecil untuk tutorial lainnya
+                      for (int i = 1; i < tutorials.length; i++)
+                        _buildSmallCard(
+                          context,
+                          tutorials[i].judul,
+                          tutorials[i].creator,
+                          tutorials[i].photoCreator,
+                          tutorials[i].deskripsi,
+                          tutorials[i].video,
+                          isGreyBackground: i % 2 == 0,
+                        ),
+                    ],
+                  );
+                }
+              },
             ),
-            const SizedBox(height: 10),
-            // Card kecil pertama - latar belakang abu-abu
-            _buildSmallCard(context, "Judul Video 1", "Nama Penerbit",
-                "90K views • 1 minggu yang lalu",
-                isGreyBackground: true),
-            // Card kecil kedua - latar belakang putih
-            _buildSmallCard(context, "Judul Video 2", "Nama Penerbit",
-                "80K views • 3 hari yang lalu",
-                isGreyBackground: false),
-            // Card kecil ketiga - latar belakang abu-abu
-            _buildSmallCard(context, "Judul Video 3", "Nama Penerbit",
-                "70K views • 5 hari yang lalu",
-                isGreyBackground: true),
           ],
         ),
       ),
     );
   }
 
-  // Widget untuk membangun Card kecil dengan parameter latar belakang
-  Widget _buildSmallCard(
-      BuildContext context, String title, String publisher, String views,
+  Widget _buildSmallCard(BuildContext context, String title, String publisher,
+      String photoCreator, String description, String videoUrl,
       {required bool isGreyBackground}) {
     return InkWell(
       onTap: () {
-        // Navigasi ke TutorialDetailPage
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => TutorialDetailPage(
               title: title,
               publisher: publisher,
+              description: description,
+              imageUrl: photoCreator,
+              videoUrl: videoUrl,
             ),
           ),
         );
@@ -758,8 +888,8 @@ class TutorialPage extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset(
-                "asset/img/post.png",
+              Image.network(
+                photoCreator,
                 width: 120,
                 height: 70,
                 fit: BoxFit.cover,
@@ -772,24 +902,20 @@ class TutorialPage extends StatelessWidget {
                     Text(
                       title,
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Row(
                       children: [
-                        const CircleAvatar(
-                          backgroundImage: AssetImage("asset/img/profil.jpg"),
+                        CircleAvatar(
+                          backgroundImage: NetworkImage(photoCreator),
                           radius: 12,
                         ),
-                        const SizedBox(width: 8),
-                        Text(publisher),
+                        const SizedBox(width: 10),
+                        Text(publisher,
+                            style: const TextStyle(color: Colors.grey)),
                       ],
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      views,
-                      style: const TextStyle(color: Colors.grey),
                     ),
                   ],
                 ),
@@ -802,8 +928,21 @@ class TutorialPage extends StatelessWidget {
   }
 }
 
-class ObatPage extends StatelessWidget {
+class ObatPage extends StatefulWidget {
   const ObatPage({super.key});
+
+  @override
+  State<ObatPage> createState() => _ObatPageState();
+}
+
+class _ObatPageState extends State<ObatPage> {
+  late Future<List<Obat>> futureObats;
+
+  @override
+  void initState() {
+    super.initState();
+    futureObats = ApiService().getObats();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -835,7 +974,8 @@ class ObatPage extends StatelessWidget {
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w400,
+                      fontFamily: 'Righteous',
                     ),
                   ),
                 ),
@@ -871,12 +1011,31 @@ class ObatPage extends StatelessWidget {
                     ),
                     SizedBox(
                       height: 420, // Tinggi tab view untuk card-card obat
-                      child: TabBarView(
-                        children: [
-                          _buildObatTabContent("Cair"),
-                          _buildObatTabContent("Bubuk"),
-                          _buildObatTabContent("Pupuk"),
-                        ],
+                      child: FutureBuilder<List<Obat>>(
+                        future: futureObats,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.isEmpty) {
+                            return const Center(
+                                child: Text('No data available'));
+                          } else {
+                            final obats = snapshot.data!;
+                            return TabBarView(
+                              children: [
+                                _buildJenisObatTab(obats, "Cair"),
+                                _buildJenisObatTab(obats, "Bubuk"),
+                                _buildJenisObatTab(obats, "Pupuk"),
+                              ],
+                            );
+                          }
+                        },
                       ),
                     ),
                   ],
@@ -890,66 +1049,83 @@ class ObatPage extends StatelessWidget {
   }
 
   // Fungsi untuk membangun isi tab obat dengan card-card
-  Widget _buildObatTabContent(String type) {
+  Widget _buildJenisObatTab(List<Obat> obats, String type) {
+    final filteredObats = obats.where((obat) => obat.jenis == type).toList();
     return ListView.builder(
-      itemCount: 6, // Jumlah card sebagai contoh
+      itemCount: filteredObats.length,
       itemBuilder: (context, index) {
-        bool isOdd = index % 2 == 0;
-        return InkWell(
-            onTap: () {
-              // Navigasi ke TutorialDetailPage
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ObatDetailPage(
-                    name: "Judul Obat $type ${index + 1}",
-                    price: "Rp 10.000",
-                    imagePath: "asset/img/post.png",
+        final obatDetail = filteredObats[index].obats;
+        return Column(
+          children: obatDetail.map((obat) {
+            bool isOdd = index % 2 == 0;
+            return InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ObatDetailPage(
+                      name: obat.namaObat,
+                      imagePath: obat.photoObat,
+                      description: obat.deskripsi,
+                      fungsiobats: obat.fungsiobats,
+                    ),
+                  ),
+                );
+              },
+              child: Card(
+                color: isOdd ? Colors.grey[200] : Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Image.network(
+                        obat.photoObat,
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(Icons.error);
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        },
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              obat.namaObat,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              obat.deskripsi,
+                              style: const TextStyle(color: Colors.grey),
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2, // Batas maksimal baris teks
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              );
-            },
-            child: Card(
-              color: isOdd ? Colors.grey[200] : Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Image.asset(
-                      "asset/img/post.png",
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.cover,
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Judul Obat $type ${index + 1}",
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "Deskripsi singkat tentang obat jenis $type. "
-                            "Obat ini digunakan untuk mengatasi masalah tertentu.",
-                            style: const TextStyle(color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ));
+            );
+          }).toList(),
+        );
       },
     );
   }

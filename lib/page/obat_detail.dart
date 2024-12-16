@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:taniku/models/obat_model.dart';
 import 'package:taniku/page/tutorial_detail.dart';
 
 class ObatDetailPage extends StatelessWidget {
   final String name;
-  final String price;
   final String imagePath;
+  final String description;
+  final List<FungsiDetail> fungsiobats;
 
-  const ObatDetailPage(
-      {super.key,
-      required this.name,
-      required this.price,
-      required this.imagePath});
+  const ObatDetailPage({
+    super.key,
+    required this.name,
+    required this.imagePath,
+    required this.description,
+    required this.fungsiobats,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -68,10 +72,16 @@ class ObatDetailPage extends StatelessWidget {
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 10),
-              Image.asset(
+              Image.network(
                 imagePath,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(Icons.error);
+                },
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return const Center(child: CircularProgressIndicator());
+                },
               ),
-
               const SizedBox(height: 10),
               // Harga dari pajak lain
               Column(
@@ -80,14 +90,14 @@ class ObatDetailPage extends StatelessWidget {
                   Text(
                     name,
                     style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xff00813E)),
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xff00813E),
+                    ),
                   ),
                   const SizedBox(height: 5),
-                  const Text(
-                      "Roundup digunakan dengan tujuan utama untuk mengendalikan gulma dan tanaman yang tidak diinginkan dalam pertanian dan lanskap. ",
-                      style: TextStyle(
+                  Text(description,
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       )),
@@ -107,15 +117,17 @@ class ObatDetailPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   SizedBox(
-                    height: 160,
-                    // Tinggi card
-                    child: ListView(
+                    height: 180,
+                    child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      children: [
-                        _buildCard("Mengendalikan Gulma", imagePath),
-                        _buildCard("Pemeliharaan Kebun", imagePath),
-                        _buildCard("Pengendalian Tanaman", imagePath),
-                      ],
+                      itemCount: fungsiobats.length,
+                      itemBuilder: (context, index) {
+                        final fungsiObat = fungsiobats[index];
+                        return _buildCardFungsi(
+                          fungsiObat.fungsi,
+                          fungsiObat.potoFungsi,
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -148,10 +160,9 @@ class ObatDetailPage extends StatelessWidget {
       ),
     );
   }
-}
 
-Widget _buildCard(String title, String imagePath) {
-  return Card(
+  Widget _buildCardFungsi(String title, String imagePath) {
+    return Card(
       color: Colors.white, // Membuat card transparan
       child: SizedBox(
         width: 138,
@@ -162,11 +173,18 @@ Widget _buildCard(String title, String imagePath) {
               borderRadius: const BorderRadius.all(
                 Radius.circular(10),
               ),
-              child: Image.asset(
+              child: Image.network(
                 imagePath, // Gambar sesuai parameter
                 width: 138,
                 height: 109,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(Icons.error);
+                },
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return const Center(child: CircularProgressIndicator());
+                },
               ),
             ),
             Expanded(
@@ -183,108 +201,110 @@ Widget _buildCard(String title, String imagePath) {
             ),
           ],
         ),
-      ));
-}
+      ),
+    );
+  }
 
-Widget _buildSmallCard(
-  BuildContext context,
-  String title,
-  String publisher,
-  String views,
-) {
-  return InkWell(
-    onTap: () {
-      // Navigasi ke TutorialDetailPage
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => TutorialDetailPage(
-            title: title,
-            publisher: publisher,
+  Widget _buildSmallCard(
+    BuildContext context,
+    String title,
+    String publisher,
+    String views,
+  ) {
+    return InkWell(
+      // onTap: () {
+      //   // Navigasi ke TutorialDetailPage
+      //   Navigator.push(
+      //     context,
+      //     MaterialPageRoute(
+      //       builder: (context) => TutorialDetailPage(
+      //         title: title,
+      //         publisher: publisher,
+      //       ),
+      //     ),
+      //   );
+      // },
+      child: Card(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset('asset/img/post.png',
+                    width: 129, height: 116, fit: BoxFit.cover),
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        color: Color(0xff00813E),
+                        fontWeight: FontWeight.w600,
+                      ),
+                      softWrap: true,
+                      overflow: TextOverflow.visible,
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const CircleAvatar(
+                          backgroundImage: AssetImage('asset/img/profil.jpg'),
+                          radius: 28,
+                        ),
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              publisher,
+                              style: const TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.w500),
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              views,
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            const Text(
+                              '4jam yg lalu',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            )
+                          ],
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              )
+            ],
           ),
         ),
-      );
-    },
-    child: Card(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.asset('asset/img/post.png',
-                  width: 129, height: 116, fit: BoxFit.cover),
-            ),
-            const SizedBox(
-              width: 10,
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      color: Color(0xff00813E),
-                      fontWeight: FontWeight.w600,
-                    ),
-                    softWrap: true,
-                    overflow: TextOverflow.visible,
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const CircleAvatar(
-                        backgroundImage: AssetImage('asset/img/profil.jpg'),
-                        radius: 28,
-                      ),
-                      const SizedBox(
-                        width: 15,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            publisher,
-                            style: const TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            views,
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          const Text(
-                            '4jam yg lalu',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          )
-                        ],
-                      )
-                    ],
-                  )
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
-    ),
-  );
+    );
+  }
 }

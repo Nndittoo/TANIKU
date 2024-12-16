@@ -196,24 +196,41 @@ class _LoginPageState extends State<LoginPage> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            onPressed: () => {},
-                            icon: Image.asset(
-                              'asset/img/facebook.png',
-                              width: 45,
-                            ),
-                          ),
-                          IconButton(
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20, right: 20),
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
                             onPressed: _loginGoogle,
-                            icon: Image.asset(
-                              "asset/img/google.png",
-                              width: 45,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                                side:
+                                    const BorderSide(color: Color(0xff00813E)),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  "asset/img/google.png",
+                                  width: 24,
+                                  height: 24,
+                                ),
+                                const SizedBox(width: 10),
+                                const Text(
+                                  "Login with Google",
+                                  style: TextStyle(
+                                    color: Color(0xff00813E),
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
+                        ),
                       ),
                       const SizedBox(height: 20),
                       Row(
