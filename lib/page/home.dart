@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:taniku/api/weather_service.dart';
 import 'package:intl/intl.dart';
 import 'package:taniku/helper/utils.dart';
+import 'package:taniku/models/postingan_model.dart';
 import 'package:taniku/page/marketprice_detail.dart';
 import 'package:taniku/page/notifikasi.dart';
 import 'package:taniku/page/obat_detail.dart';
@@ -15,6 +16,9 @@ import 'package:taniku/models/tutorial_model.dart';
 import 'package:taniku/models/obat_model.dart';
 import 'package:taniku/models/marketprice_model.dart';
 import 'package:taniku/api/api_taniku.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:convert';
+import 'dart:io';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -47,17 +51,17 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const NotifikasiPage()));
-            },
-            icon: const Icon(Icons.mark_email_unread_outlined),
-            color: Colors.black87,
-            iconSize: 32,
-          ),
+          // IconButton(
+          //   onPressed: () {
+          //     Navigator.push(
+          //         context,
+          //         MaterialPageRoute(
+          //             builder: (context) => const NotifikasiPage()));
+          //   },
+          //   icon: const Icon(Icons.mark_email_unread_outlined),
+          //   color: Colors.black87,
+          //   iconSize: 32,
+          // ),
           IconButton(
             onPressed: () {
               Navigator.push(context,
@@ -67,8 +71,9 @@ class _HomePageState extends State<HomePage> {
               backgroundImage: AuthService().user.photoURL != null &&
                       AuthService().user.photoURL!.isNotEmpty
                   ? NetworkImage(AuthService().user.photoURL!)
-                  : const AssetImage("asset/img/profile_default.png")
-                      as ImageProvider,
+                  : const NetworkImage(
+                      'https://static.vecteezy.com/system/resources/previews/005/129/844/non_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg',
+                    ),
             ),
           ),
         ],
@@ -218,10 +223,10 @@ class _HomePageState extends State<HomePage> {
                                 Text(
                                   cityName,
                                   style: const TextStyle(
-                                    fontFamily: 'Montserrat',
+                                    fontFamily: 'Righteous',
                                     color: Colors.white,
                                     fontSize: 20,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                                 Text(
@@ -236,10 +241,9 @@ class _HomePageState extends State<HomePage> {
                                 Text(
                                   '${currentWeatherData['weather'][0]['description']}',
                                   style: const TextStyle(
-                                    fontFamily: 'Montserrat',
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 16,
+                                    fontSize: 18,
                                   ),
                                   softWrap: true,
                                 ),
@@ -292,7 +296,7 @@ class _HomePageState extends State<HomePage> {
             ),
 
             //akhir dari widget cuaca
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -313,12 +317,11 @@ class _HomePageState extends State<HomePage> {
                     });
                   },
                   child: const Text(
-                    "Selengkapnya >",
+                    "Semua >",
                     style: TextStyle(
                       color: Color(0xff00813E),
                       fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      fontFamily: 'Montserrat',
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ),
@@ -373,12 +376,11 @@ class _HomePageState extends State<HomePage> {
                     });
                   },
                   child: const Text(
-                    "Selengkapnya >",
+                    "Semua >",
                     style: TextStyle(
                       color: Color(0xff00813E),
                       fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      fontFamily: 'Montserrat',
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
                 ),
@@ -406,6 +408,7 @@ class _HomePageState extends State<HomePage> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => TutorialDetailPage(
+                                id: tutorial.id,
                                 title: tutorial.judul,
                                 publisher: tutorial.creator,
                                 description: tutorial.deskripsi,
@@ -429,42 +432,26 @@ class _HomePageState extends State<HomePage> {
                                 width: double.infinity,
                                 fit: BoxFit.cover,
                               ),
-                              Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundImage:
-                                          NetworkImage(tutorial.photoCreator),
-                                      radius: 28,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            tutorial.judul,
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(
-                                            tutorial.creator,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                              const SizedBox(height: 10),
+                              Text(
+                                tutorial.judul,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xff00813E),
                                 ),
                               ),
+                              Text(
+                                tutorial.deskripsi,
+                                style: const TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 16,
+                                ),
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 4,
+                              ),
+                              const SizedBox(height: 10),
                             ],
                           ),
                         ),
@@ -551,27 +538,6 @@ class MarketPricePage extends StatelessWidget {
                   }
                 },
               ),
-            ),
-            const SizedBox(height: 10),
-            // Pagination
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.arrow_back),
-                  color: const Color(0xff00813E),
-                ),
-                const Text(
-                  "Page 1 of 5",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.arrow_forward),
-                  color: const Color(0xff00813E),
-                ),
-              ],
             ),
           ],
         ),
@@ -776,6 +742,7 @@ class TutorialPage extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (context) => TutorialDetailPage(
+                                id: tutorials[0].id,
                                 title: tutorials[0].judul,
                                 publisher: tutorials[0].creator,
                                 description: tutorials[0].deskripsi,
@@ -793,11 +760,14 @@ class TutorialPage extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Image.network(
-                                tutorials[0].photoCreator,
-                                height: 200,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(
+                                  tutorials[0].photoCreator,
+                                  height: 200,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(12.0),
@@ -807,7 +777,7 @@ class TutorialPage extends StatelessWidget {
                                     CircleAvatar(
                                       backgroundImage: NetworkImage(
                                           tutorials[0].photoCreator),
-                                      radius: 20,
+                                      radius: 35,
                                     ),
                                     const SizedBox(width: 10),
                                     Expanded(
@@ -818,14 +788,15 @@ class TutorialPage extends StatelessWidget {
                                           Text(
                                             tutorials[0].judul,
                                             style: const TextStyle(
-                                              fontSize: 18,
+                                              fontSize: 20,
                                               fontWeight: FontWeight.bold,
+                                              color: Color(0xff00813E),
                                             ),
                                           ),
                                           Text(
                                             tutorials[0].creator,
                                             style: const TextStyle(
-                                                color: Colors.grey),
+                                                color: Colors.black87),
                                           ),
                                         ],
                                       ),
@@ -842,6 +813,7 @@ class TutorialPage extends StatelessWidget {
                       for (int i = 1; i < tutorials.length; i++)
                         _buildSmallCard(
                           context,
+                          tutorials[i].id,
                           tutorials[i].judul,
                           tutorials[i].creator,
                           tutorials[i].photoCreator,
@@ -860,8 +832,14 @@ class TutorialPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSmallCard(BuildContext context, String title, String publisher,
-      String photoCreator, String description, String videoUrl,
+  Widget _buildSmallCard(
+      BuildContext context,
+      int id,
+      String title,
+      String publisher,
+      String photoCreator,
+      String description,
+      String videoUrl,
       {required bool isGreyBackground}) {
     return InkWell(
       onTap: () {
@@ -869,6 +847,7 @@ class TutorialPage extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => TutorialDetailPage(
+              id: id,
               title: title,
               publisher: publisher,
               description: description,
@@ -888,11 +867,14 @@ class TutorialPage extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.network(
-                photoCreator,
-                width: 120,
-                height: 70,
-                fit: BoxFit.cover,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network(
+                  photoCreator,
+                  width: 129,
+                  height: 116,
+                  fit: BoxFit.cover,
+                ),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -902,19 +884,23 @@ class TutorialPage extends StatelessWidget {
                     Text(
                       title,
                       style: const TextStyle(
-                        fontSize: 18,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
+                        color: Color(0xff00813E),
                       ),
                     ),
                     Row(
                       children: [
                         CircleAvatar(
                           backgroundImage: NetworkImage(photoCreator),
-                          radius: 12,
+                          radius: 30,
                         ),
                         const SizedBox(width: 10),
                         Text(publisher,
-                            style: const TextStyle(color: Colors.grey)),
+                            style: const TextStyle(
+                              color: Colors.black87,
+                              fontSize: 14,
+                            )),
                       ],
                     ),
                   ],
@@ -970,26 +956,27 @@ class _ObatPageState extends State<ObatPage> {
                   left: 16,
                   top: 16,
                   child: Text(
-                    "Informasi Tentang Obat",
+                    "Informasi Tentang \nObat",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 24,
+                      fontSize: 32,
                       fontWeight: FontWeight.w400,
                       fontFamily: 'Righteous',
                     ),
+                    softWrap: true,
                   ),
                 ),
-                const Positioned(
-                  right: 16,
-                  bottom: 16,
-                  child: Text(
-                    "Tanggal post: 01-10-2024",
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
+                // const Positioned(
+                //   right: 16,
+                //   bottom: 16,
+                //   child: Text(
+                //     "Tanggal post: 01-10-2024",
+                //     style: TextStyle(
+                //       color: Colors.white70,
+                //       fontSize: 12,
+                //     ),
+                //   ),
+                // ),
               ],
             ),
             const SizedBox(height: 20),
@@ -1001,7 +988,7 @@ class _ObatPageState extends State<ObatPage> {
                   children: [
                     const TabBar(
                       labelColor: Colors.black,
-                      unselectedLabelColor: Colors.grey,
+                      unselectedLabelColor: Colors.green,
                       indicatorColor: Colors.green,
                       tabs: [
                         Tab(text: "Cair"),
@@ -1057,13 +1044,13 @@ class _ObatPageState extends State<ObatPage> {
         final obatDetail = filteredObats[index].obats;
         return Column(
           children: obatDetail.map((obat) {
-            bool isOdd = index % 2 == 0;
             return InkWell(
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ObatDetailPage(
+                      id: obat.id,
                       name: obat.namaObat,
                       imagePath: obat.photoObat,
                       description: obat.deskripsi,
@@ -1073,7 +1060,7 @@ class _ObatPageState extends State<ObatPage> {
                 );
               },
               child: Card(
-                color: isOdd ? Colors.grey[200] : Colors.white,
+                color: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -1084,16 +1071,28 @@ class _ObatPageState extends State<ObatPage> {
                     children: [
                       Image.network(
                         obat.photoObat,
-                        width: 80,
-                        height: 80,
+                        width: 158,
+                        height: 128,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
-                          return const Icon(Icons.error);
+                          return Container(
+                            width: 158,
+                            height: 128,
+                            alignment: Alignment.center,
+                            child: const Icon(
+                              Icons.error,
+                              size: 50, // Ukuran ikon kesalahan
+                            ),
+                          );
                         },
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
-                          return const Center(
-                              child: CircularProgressIndicator());
+                          return Container(
+                            width: 158,
+                            height: 128,
+                            alignment: Alignment.center,
+                            child: const CircularProgressIndicator(),
+                          );
                         },
                       ),
                       const SizedBox(width: 10),
@@ -1104,17 +1103,22 @@ class _ObatPageState extends State<ObatPage> {
                             Text(
                               obat.namaObat,
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
+                                color: Color(0xff00813E),
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               obat.deskripsi,
-                              style: const TextStyle(color: Colors.grey),
+                              style: const TextStyle(
+                                color: Colors.black87,
+                                fontSize: 14,
+                              ),
                               softWrap: true,
                               overflow: TextOverflow.ellipsis,
-                              maxLines: 2, // Batas maksimal baris teks
+                              maxLines: 5,
+                              // Batas maksimal baris teks
                             ),
                           ],
                         ),
@@ -1183,22 +1187,15 @@ class _CuacaPageState extends State<CuacaPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Judul dengan tombol "Location" dan icon
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     "Cuaca",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
-                  ),
-                  TextButton.icon(
-                    onPressed: () {
-                      // Tindakan ketika tombol location ditekan
-                    },
-                    icon: const Icon(Icons.location_on),
-                    label: const Text('Lokasi'),
                   ),
                 ],
               ),
@@ -1239,30 +1236,56 @@ class _CuacaPageState extends State<CuacaPage> {
                     var weatherCondition =
                         currentWeatherData['weather'][0]['main'];
                     String imagePath = getWeatherImage(weatherCondition);
-
-                    return Center(
-                      child: Column(
-                        children: [
-                          Image.asset(
-                            imagePath,
-                            height: 150,
-                            width: 150,
+                    String cityName = currentWeatherData['name'];
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Positioned(
+                          top: -114,
+                          right: 0, // Kotak hijau naik keluar
+                          child: Row(
+                            children: [
+                              const Icon(Icons.location_on, color: Colors.red),
+                              Text(
+                                cityName,
+                                style: const TextStyle(
+                                  color: Color(0xff00813E),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            "${currentWeatherData['main']['temp'].toInt()}°C",
-                            style: const TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xff00813E),
-                            ),
+                        ),
+                        Center(
+                          child: Column(
+                            children: [
+                              Image.asset(
+                                imagePath,
+                                height: 150,
+                                width: 150,
+                              ),
+                              Text(
+                                "${currentWeatherData['main']['temp'].toInt()}°C",
+                                style: const TextStyle(
+                                  fontSize: 36,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xff00813E),
+                                  fontFamily: 'Montserrat',
+                                ),
+                              ),
+                              Text(
+                                currentWeatherData['weather'][0]['description'],
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 33,
+                                  color: Color(0xff00813E),
+                                ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            currentWeatherData['weather'][0]['description'],
-                            style: const TextStyle(
-                                fontSize: 26, color: Colors.grey),
-                          ),
-                        ],
-                      ),
+                        )
+                      ],
                     );
                   } else {
                     return const Center(child: Text('Data Tidak Tersedia'));
@@ -1281,10 +1304,11 @@ class _CuacaPageState extends State<CuacaPage> {
                 child: const Text(
                   'Rekomendasi Tanaman',
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white, // Warna teks putih
-                  ),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                      fontFamily: 'Righteous' // Warna teks putih
+                      ),
                 ),
               ),
               SizedBox(
@@ -1320,30 +1344,55 @@ class _CuacaPageState extends State<CuacaPage> {
                         itemCount: recommendations.length,
                         itemBuilder: (context, index) {
                           var plant = recommendations[index];
-                          return Card(
-                            color: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              side: const BorderSide(
-                                  color: Colors.black, width: 1),
-                            ),
-                            margin: const EdgeInsets.all(8.0),
-                            child: Column(
-                              children: [
-                                Image.asset(
-                                  plant['imagePath']!,
-                                  height: 80,
-                                  width: 80,
-                                  fit: BoxFit.cover,
+                          return SizedBox(
+                            height: 155,
+                            width: 130,
+                            child: Card(
+                              color: Colors.white, // Latar belakang putih
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(12), // Radius card
+                                side: const BorderSide(
+                                    color: Colors.black,
+                                    width: .3), // Border hitam
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(
+                                    5.0), // Padding 10 di setiap sisi
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      plant['imagePath']!,
+                                      width:
+                                          75, // Lebar gambar agar proporsional
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return const Icon(Icons.error);
+                                      },
+                                    ),
+                                    const SizedBox(
+                                        height:
+                                            8), // Spasi antara gambar dan teks
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          plant['name']!,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 20,
+                                            fontFamily: 'Montserrat',
+                                          ),
+                                          textAlign: TextAlign.start,
+                                        ),
+                                      ],
+                                    )
+                                  ],
                                 ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  plant['name']!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
                           );
                         },
@@ -1437,8 +1486,43 @@ class _CuacaPageState extends State<CuacaPage> {
   }
 }
 
-class SearchPage extends StatelessWidget {
+class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
+
+  @override
+  State<SearchPage> createState() => _SearchPageState();
+}
+
+class _SearchPageState extends State<SearchPage> {
+  final ApiService apiService = ApiService();
+  final TextEditingController _searchController = TextEditingController();
+  List<ObatDetail> _obatResults = [];
+  List<Tutorial> _tutorialResults = [];
+  bool _isLoading = false;
+
+  void _search(String query) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final results = await apiService.search(query);
+      setState(() {
+        _obatResults = (results['obats'] as List)
+            .map((json) => ObatDetail.fromJson(json))
+            .toList();
+        _tutorialResults = (results['tutorials'] as List)
+            .map((json) => Tutorial.fromJson(json))
+            .toList();
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      // Handle error
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1462,6 +1546,7 @@ class SearchPage extends StatelessWidget {
           children: [
             // Field pencarian
             TextField(
+              controller: _searchController,
               decoration: InputDecoration(
                 hintText: "Cari...",
                 contentPadding: const EdgeInsets.symmetric(vertical: 10),
@@ -1473,50 +1558,76 @@ class SearchPage extends StatelessWidget {
                   borderSide: BorderSide.none,
                 ),
               ),
+              onSubmitted: (query) {
+                _search(query);
+              },
             ),
             const SizedBox(height: 20),
-            // Bagian riwayat pencarian
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Row(
+            // Bagian hasil pencarian
+            if (_isLoading)
+              const Center(child: CircularProgressIndicator())
+            else if (_obatResults.isEmpty && _tutorialResults.isEmpty)
+              const Center(child: Text('Tidak ada hasil ditemukan'))
+            else
+              Expanded(
+                child: ListView(
                   children: [
-                    Icon(Icons.history, color: Colors.grey),
-                    SizedBox(width: 8),
-                    Text(
-                      "Riwayat Pencarian",
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
+                    if (_obatResults.isNotEmpty) ...[
+                      const Text(
+                        "Obat",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      for (var obat in _obatResults)
+                        ListTile(
+                          title: Text(obat.namaObat),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ObatDetailPage(
+                                  id: obat.id,
+                                  name: obat.namaObat,
+                                  imagePath: obat.photoObat,
+                                  description: obat.deskripsi,
+                                  fungsiobats: obat.fungsiobats,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                    ],
+                    if (_tutorialResults.isNotEmpty) ...[
+                      const Text(
+                        "Tutorial",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      for (var tutorial in _tutorialResults)
+                        ListTile(
+                          title: Text(tutorial.judul),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TutorialDetailPage(
+                                  id: tutorial.id,
+                                  title: tutorial.judul,
+                                  publisher: tutorial.creator,
+                                  description: tutorial.deskripsi,
+                                  imageUrl: tutorial.photoCreator,
+                                  videoUrl: tutorial.video,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                    ],
                   ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.clear, color: Colors.grey),
-                  onPressed: () {
-                    // Tindakan untuk menghapus riwayat pencarian
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            // Daftar riwayat pencarian (contoh statis)
-            Expanded(
-              child: ListView(
-                children: const [
-                  ListTile(
-                    title: Text("Pencarian 1"),
-                    leading: Icon(Icons.search, color: Colors.green),
-                  ),
-                  ListTile(
-                    title: Text("Pencarian 2"),
-                    leading: Icon(Icons.search, color: Colors.green),
-                  ),
-                  ListTile(
-                    title: Text("Pencarian 3"),
-                    leading: Icon(Icons.search, color: Colors.green),
-                  ),
-                ],
               ),
-            ),
           ],
         ),
       ),
@@ -1535,6 +1646,8 @@ class _AddPostPageState extends State<AddPostPage> {
   final TextEditingController _postController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   bool _isPostingButtonVisible = false;
+  final ApiService apiService = ApiService();
+  File? _selectedImage;
 
   @override
   void initState() {
@@ -1551,6 +1664,46 @@ class _AddPostPageState extends State<AddPostPage> {
     _postController.dispose();
     _focusNode.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> _createPost() async {
+    if (_postController.text.isEmpty || _selectedImage == null) {
+      log('Deskripsi dan gambar tidak boleh kosong');
+      return;
+    }
+
+    try {
+      final user = AuthService().user;
+
+      final bytes = await _selectedImage!.readAsBytes();
+      final base64Image = base64Encode(bytes);
+
+      await apiService.createPost(
+        idUser: user.uid,
+        deskripsi: _postController.text,
+        displayname: user.displayName ?? 'User',
+        photoUserUrl: user.photoURL ??
+            'https://static.vecteezy.com/system/resources/previews/005/129/844/non_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg',
+        gambarPostingan: base64Image,
+      );
+
+      log('Postingan berhasil dibuat');
+
+      Navigator.pop(context);
+    } catch (e) {
+      log('Gagal membuat postingan: $e');
+    }
   }
 
   @override
@@ -1575,7 +1728,7 @@ class _AddPostPageState extends State<AddPostPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(12),
@@ -1590,158 +1743,153 @@ class _AddPostPageState extends State<AddPostPage> {
                   maxLines: 1,
                 ),
               ),
+              if (_selectedImage != null)
+                Image.file(
+                  _selectedImage!,
+                  height: 150,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
               // Tombol "Posting" muncul saat TextField ditekan
               if (_isPostingButtonVisible)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Fungsi untuk memposting konten
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: ElevatedButton(
+                        onPressed: _createPost,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          "Posting",
+                          style: TextStyle(
+                              fontFamily: "Righteous", color: Colors.white),
+                        ),
                       ),
                     ),
-                    child: const Text(
-                      "Video Baru",
-                      style: TextStyle(
-                          fontFamily: "Righteous", color: Colors.white),
+                    ElevatedButton.icon(
+                      onPressed: _pickImage,
+                      icon: const Icon(Icons.photo_camera, color: Colors.white),
+                      label: const Text(
+                        "Foto Baru",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xff00813E),
+                        textStyle: const TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              const SizedBox(height: 5),
-              // Tombol "Video Baru" dan "Foto Baru" di luar TextField
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      // Fungsi untuk menambahkan video
-                    },
-                    icon: const Icon(Icons.video_camera_back,
-                        color: Colors.white),
-                    label: const Text("Video Baru"),
-                    style: ElevatedButton.styleFrom(
-                      iconColor: Colors.white,
-                      backgroundColor: const Color(0xff00813E),
-                      textStyle: const TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      // Fungsi untuk menambahkan foto
-                    },
-                    icon: const Icon(Icons.photo_camera, color: Colors.white),
-                    label: const Text("Foto Baru"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xff00813E),
-                      textStyle: const TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+
               const SizedBox(height: 15),
               // Judul untuk "Postingan dari Petani Lain"
               const Text(
                 "Postingan dari Petani Lain",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              ListView.builder(
-                shrinkWrap: true, // Agar ListView menyesuaikan ukuran konten
-                physics:
-                    const NeverScrollableScrollPhysics(), // Menonaktifkan scroll pada ListView agar tidak bentrok dengan SingleChildScrollView
-                itemCount: 3, // Contoh jumlah postingan
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Nama pengguna dan waktu posting
-                          Row(
-                            children: [
-                              const CircleAvatar(
-                                backgroundImage:
-                                    AssetImage("asset/img/profil.jpg"),
-                                radius: 20,
+              const SizedBox(height: 20),
+              FutureBuilder<List<Postingan>>(
+                future: apiService.getPostingan(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return const Center(child: Text('Gagal Memuat Data'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(
+                        child: Text('Postingan Tidak Ditemukan'));
+                  } else {
+                    final postingan = snapshot.data!;
+                    return ListView.builder(
+                      shrinkWrap:
+                          true, // Agar ListView menyesuaikan ukuran konten
+                      physics:
+                          const NeverScrollableScrollPhysics(), // Menonaktifkan scroll pada ListView agar tidak bentrok dengan SingleChildScrollView
+                      itemCount: postingan.length,
+                      itemBuilder: (context, index) {
+                        final post = postingan[index];
+                        return Container(
+                          margin: const EdgeInsets.symmetric(vertical: 8.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
                               ),
-                              const SizedBox(width: 10),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Petani ${index + 1}",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const Text(
-                                    "2 jam yang lalu",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey,
+                            ],
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Nama pengguna dan waktu posting
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage:
+                                          NetworkImage(post.photoUserUrl),
+                                      radius: 20,
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                    const SizedBox(width: 10),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          post.displayname,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Text(
+                                          post.dibuat,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                // Konten postingan
+                                Text(post.deskripsi),
+                                const SizedBox(height: 10),
+                                // Gambar di postingan (opsional)
+                                Image.network(
+                                  post.gambarPostingan,
+                                  height: 150,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Icon(Icons.error);
+                                  },
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return const Center(
+                                        child: CircularProgressIndicator());
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 10),
-                          // Konten postingan
-                          const Text(
-                            "Ini adalah contoh postingan dari petani lain. Informasi mengenai produk atau aktivitas terkini.",
-                          ),
-                          const SizedBox(height: 10),
-                          // Gambar di postingan (opsional)
-                          Image.asset(
-                            "asset/img/post.png",
-                            height: 150,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                          const SizedBox(height: 10),
-                          // Tombol like dan komentar
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              TextButton.icon(
-                                onPressed: () {
-                                  // Aksi ketika tombol Like ditekan
-                                },
-                                icon: const Icon(Icons.thumb_up_alt_outlined),
-                                label: const Text("Like"),
-                              ),
-                              TextButton.icon(
-                                onPressed: () {
-                                  // Aksi ketika tombol Komentar ditekan
-                                },
-                                icon: const Icon(Icons.comment_outlined),
-                                label: const Text("Komentar"),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
+                        );
+                      },
+                    );
+                  }
                 },
               ),
             ],

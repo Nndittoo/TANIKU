@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:taniku/models/tutorial_model.dart';
 import 'package:taniku/page/tutorial_detail.dart';
 import 'package:taniku/models/marketprice_model.dart';
 import 'package:taniku/api/api_taniku.dart';
@@ -231,24 +232,42 @@ class _MarketPriceDetailPageState extends State<MarketPriceDetailPage> {
                               );
                             })
                           else
-                            const Text(
-                              "Harga dari pajak lain tidak tersedia",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.grey,
+                            Container(
+                              padding:
+                                  const EdgeInsets.only(bottom: 30, top: 30),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  "Harga dari pajak lain tidak tersedia",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.black87,
+                                  ),
+                                ),
                               ),
                             ),
                           if (marketPrice.kilos.length > 3)
-                            TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  showAllPajak = !showAllPajak;
-                                });
-                              },
-                              child: Text(showAllPajak
-                                  ? 'Tampilkan lebih sedikit'
-                                  : 'Tampilkan semua'),
+                            Center(
+                              child: TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    showAllPajak = !showAllPajak;
+                                  });
+                                },
+                                child: Text(
+                                  showAllPajak
+                                      ? 'Tampilkan lebih sedikit'
+                                      : 'Tampilkan semua',
+                                  style: const TextStyle(
+                                    color: Color(0xff00813E),
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
                             ),
                         ],
                       );
@@ -282,23 +301,35 @@ class _MarketPriceDetailPageState extends State<MarketPriceDetailPage> {
                   ],
                 ),
                 const SizedBox(height: 10),
-                _buildSmallCard(
-                  context,
-                  "Tutorial Title",
-                  "Publisher Name",
-                  "1000 views",
-                ),
-                _buildSmallCard(
-                  context,
-                  "Tutorial Title",
-                  "Publisher Name",
-                  "1000 views",
-                ),
-                _buildSmallCard(
-                  context,
-                  "Tutorial Title",
-                  "Publisher Name",
-                  "1000 views",
+                FutureBuilder<List<Tutorial>>(
+                  future: apiService.getTutorials(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return const Center(child: Text('Gagal memuat data'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(
+                          child: Text('Tidak ada video tutorial'));
+                    } else {
+                      final tutorials = snapshot.data!
+                          .where((tutorial) => tutorial.idBuah == widget.id)
+                          .toList();
+                      return Column(
+                        children: tutorials.map((tutorial) {
+                          return _buildSmallCard(
+                            context,
+                            tutorial.id,
+                            tutorial.judul,
+                            tutorial.creator,
+                            tutorial.photoCreator,
+                            tutorial.deskripsi,
+                            tutorial.video,
+                          );
+                        }).toList(),
+                      );
+                    }
+                  },
                 ),
               ],
             ),
@@ -377,23 +408,29 @@ class _MarketPriceDetailPageState extends State<MarketPriceDetailPage> {
   // Widget untuk menampilkan tutorial
   Widget _buildSmallCard(
     BuildContext context,
+    int id,
     String title,
     String publisher,
-    String views,
+    String photoCreator,
+    String description,
+    String videoUrl,
   ) {
     return InkWell(
-      // onTap: () {
-      //   // Navigasi ke TutorialDetailPage
-      //   Navigator.push(
-      //     context,
-      //     MaterialPageRoute(
-      //       builder: (context) => TutorialDetailPage(
-      //         title: title,
-      //         publisher: publisher,
-      //       ),
-      //     ),
-      //   );
-      // },
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TutorialDetailPage(
+              id: id,
+              title: title,
+              publisher: publisher,
+              description: description,
+              imageUrl: photoCreator,
+              videoUrl: videoUrl,
+            ),
+          ),
+        );
+      },
       child: Card(
         color: Colors.white,
         shape: RoundedRectangleBorder(
@@ -404,11 +441,14 @@ class _MarketPriceDetailPageState extends State<MarketPriceDetailPage> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset(
-                "asset/img/post.png",
-                width: 120,
-                height: 70,
-                fit: BoxFit.cover,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network(
+                  photoCreator,
+                  width: 129,
+                  height: 116,
+                  fit: BoxFit.cover,
+                ),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -418,25 +458,24 @@ class _MarketPriceDetailPageState extends State<MarketPriceDetailPage> {
                     Text(
                       title,
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'Monsterrat',
+                        color: Color(0xff00813E),
                       ),
                     ),
                     Row(
                       children: [
-                        const CircleAvatar(
-                          backgroundImage: AssetImage("asset/img/profil.jpg"),
-                          radius: 12,
+                        CircleAvatar(
+                          backgroundImage: NetworkImage(photoCreator),
+                          radius: 30,
                         ),
-                        const SizedBox(width: 8),
-                        Text(publisher),
+                        const SizedBox(width: 10),
+                        Text(publisher,
+                            style: const TextStyle(
+                              color: Colors.black87,
+                              fontSize: 14,
+                            )),
                       ],
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      views,
-                      style: const TextStyle(color: Colors.grey),
                     ),
                   ],
                 ),

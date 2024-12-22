@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:taniku/api/api_taniku.dart';
 import 'package:taniku/models/obat_model.dart';
+import 'package:taniku/models/tutorial_model.dart';
 import 'package:taniku/page/tutorial_detail.dart';
 
 class ObatDetailPage extends StatelessWidget {
+  final int id;
   final String name;
   final String imagePath;
   final String description;
@@ -10,6 +13,7 @@ class ObatDetailPage extends StatelessWidget {
 
   const ObatDetailPage({
     super.key,
+    required this.id,
     required this.name,
     required this.imagePath,
     required this.description,
@@ -18,6 +22,7 @@ class ObatDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ApiService apiService = ApiService();
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(40), // Tinggi AppBar
@@ -74,6 +79,8 @@ class ObatDetailPage extends StatelessWidget {
               const SizedBox(height: 10),
               Image.network(
                 imagePath,
+                width: 401,
+                height: 213,
                 errorBuilder: (context, error, stackTrace) {
                   return const Icon(Icons.error);
                 },
@@ -146,11 +153,35 @@ class ObatDetailPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 3),
-                  _buildSmallCard(
-                    context,
-                    "Menggunakan Roundup",
-                    "Admin Taniku",
-                    "1000 views",
+                  FutureBuilder<List<Tutorial>>(
+                    future: apiService.getTutorials(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return const Center(child: Text('Gagal memuat data'));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(
+                            child: Text('Tidak ada video obat'));
+                      } else {
+                        final tutorials = snapshot.data!
+                            .where((tutorial) => tutorial.idObat == id)
+                            .toList();
+                        return Column(
+                          children: tutorials.map((tutorial) {
+                            return _buildSmallCard(
+                              context,
+                              tutorial.id,
+                              tutorial.judul,
+                              tutorial.creator,
+                              tutorial.photoCreator,
+                              tutorial.deskripsi,
+                              tutorial.video,
+                            );
+                          }).toList(),
+                        );
+                      }
+                    },
                   ),
                 ],
               ),
@@ -207,23 +238,29 @@ class ObatDetailPage extends StatelessWidget {
 
   Widget _buildSmallCard(
     BuildContext context,
+    int id,
     String title,
     String publisher,
-    String views,
+    String photoCreator,
+    String description,
+    String videoUrl,
   ) {
     return InkWell(
-      // onTap: () {
-      //   // Navigasi ke TutorialDetailPage
-      //   Navigator.push(
-      //     context,
-      //     MaterialPageRoute(
-      //       builder: (context) => TutorialDetailPage(
-      //         title: title,
-      //         publisher: publisher,
-      //       ),
-      //     ),
-      //   );
-      // },
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TutorialDetailPage(
+              id: id,
+              title: title,
+              publisher: publisher,
+              description: description,
+              imageUrl: photoCreator,
+              videoUrl: videoUrl,
+            ),
+          ),
+        );
+      },
       child: Card(
         color: Colors.white,
         shape: RoundedRectangleBorder(
@@ -232,16 +269,18 @@ class ObatDetailPage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.asset('asset/img/post.png',
-                    width: 129, height: 116, fit: BoxFit.cover),
+                child: Image.network(
+                  photoCreator,
+                  width: 129,
+                  height: 116,
+                  fit: BoxFit.cover,
+                ),
               ),
-              const SizedBox(
-                width: 10,
-              ),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -250,57 +289,27 @@ class ObatDetailPage extends StatelessWidget {
                       title,
                       style: const TextStyle(
                         fontSize: 20,
+                        fontWeight: FontWeight.bold,
                         color: Color(0xff00813E),
-                        fontWeight: FontWeight.w600,
                       ),
-                      softWrap: true,
-                      overflow: TextOverflow.visible,
-                    ),
-                    const SizedBox(
-                      height: 5,
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const CircleAvatar(
-                          backgroundImage: AssetImage('asset/img/profil.jpg'),
-                          radius: 28,
+                        CircleAvatar(
+                          backgroundImage: NetworkImage(photoCreator),
+                          radius: 30,
                         ),
-                        const SizedBox(
-                          width: 15,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              publisher,
-                              style: const TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.w500),
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            Text(
-                              views,
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            const Text(
-                              '4jam yg lalu',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            )
-                          ],
-                        )
+                        const SizedBox(width: 10),
+                        Text(publisher,
+                            style: const TextStyle(
+                              color: Colors.black87,
+                              fontSize: 14,
+                            )),
                       ],
-                    )
+                    ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flick_video_player/flick_video_player.dart';
+import 'package:taniku/api/api_taniku.dart';
+import 'package:taniku/models/tutorial_model.dart';
 import 'package:video_player/video_player.dart';
 
 class TutorialDetailPage extends StatefulWidget {
+  final int id;
   final String title;
   final String publisher;
   final String description;
@@ -11,6 +14,7 @@ class TutorialDetailPage extends StatefulWidget {
 
   const TutorialDetailPage({
     super.key,
+    required this.id,
     required this.title,
     required this.publisher,
     required this.description,
@@ -201,81 +205,117 @@ class _TutorialDetailPageState extends State<TutorialDetailPage> {
               ],
             ),
             const SizedBox(height: 10),
-            Card(
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+            FutureBuilder<List<Tutorial>>(
+              future: ApiService().getTutorials(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return const Center(child: Text('Gagal memuat data'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('Tidak ada video lainnya'));
+                } else {
+                  final tutorials = snapshot.data!
+                      .where((tutorial) => tutorial.id != widget.id)
+                      .toList();
+                  return Column(
+                    children: tutorials.map((tutorial) {
+                      return _buildSmallCard(
+                        context,
+                        tutorial.id,
+                        tutorial.judul,
+                        tutorial.creator,
+                        tutorial.photoCreator,
+                        tutorial.deskripsi,
+                        tutorial.video,
+                      );
+                    }).toList(),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSmallCard(
+    BuildContext context,
+    int id,
+    String title,
+    String publisher,
+    String photoCreator,
+    String description,
+    String videoUrl,
+  ) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TutorialDetailPage(
+              id: id,
+              title: title,
+              publisher: publisher,
+              description: description,
+              imageUrl: photoCreator,
+              videoUrl: videoUrl,
+            ),
+          ),
+        );
+      },
+      child: Card(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network(
+                  photoCreator,
+                  width: 129,
+                  height: 116,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.network(
-                        widget.imageUrl,
-                        width: 129,
-                        height: 116,
-                        fit: BoxFit.cover,
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xff00813E),
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Cara Menanam Sayuran di Rumah',
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: Color(0xff00813E),
-                              fontWeight: FontWeight.w600,
-                            ),
-                            softWrap: true,
-                            overflow: TextOverflow.visible,
-                          ),
-                          const SizedBox(height: 5),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              CircleAvatar(
-                                backgroundImage: NetworkImage(widget.imageUrl),
-                                radius: 28,
-                              ),
-                              const SizedBox(width: 15),
-                              const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Toko ekambi',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  SizedBox(height: 5),
-                                  Text(
-                                    'Jumlah penonton',
-                                    style: TextStyle(fontSize: 14),
-                                  ),
-                                  SizedBox(height: 5),
-                                  Text(
-                                    '4jam yg lalu',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundImage: NetworkImage(photoCreator),
+                          radius: 30,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(publisher,
+                            style: const TextStyle(
+                              color: Colors.black87,
+                              fontSize: 14,
+                            )),
+                      ],
                     ),
                   ],
                 ),
               ),
-            )
-          ],
+            ],
+          ),
         ),
       ),
     );

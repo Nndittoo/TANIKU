@@ -14,16 +14,46 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(40), // Tinggi AppBar
+        child: Container(
+          color: Colors.transparent, // Warna AppBar putih
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Align(
+              alignment: Alignment
+                  .bottomCenter, // Menjaga posisi kontainer tetap berada di tengah AppBar
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Tombol Kembali
+                  TextButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.black87,
+                      size: 24,
+                    ),
+                    label: const Text(
+                      "Kembali",
+                      style: TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    ),
+                    style: TextButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
-        title: const Text("Profil",
-            style: TextStyle(fontSize: 24, color: Colors.black)),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
       ),
       body: Stack(
         children: [
@@ -56,8 +86,9 @@ class _ProfilePageState extends State<ProfilePage> {
               radius: 50,
               backgroundImage: user.photoURL?.isNotEmpty == true
                   ? NetworkImage(user.photoURL!)
-                  : const AssetImage("asset/img/profile_default.png")
-                      as ImageProvider,
+                  : const NetworkImage(
+                      'https://static.vecteezy.com/system/resources/previews/005/129/844/non_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg',
+                    ),
             ),
             CircleAvatar(
               radius: 16,
@@ -88,10 +119,40 @@ class _ProfilePageState extends State<ProfilePage> {
         "onPressed": () => Navigator.push(context,
             MaterialPageRoute(builder: (context) => const AddPostPage()))
       },
-      {"icon": Icons.attach_money, "label": "Harga", "onPressed": () => {}},
-      {"icon": Icons.video_call, "label": "Tutorial", "onPressed": () => {}},
-      {"icon": Icons.cloud, "label": "Cuaca", "onPressed": () => {}},
-      {"icon": Icons.water_drop, "label": "Obat", "onPressed": () => {}},
+      {
+        "icon": Icons.attach_money,
+        "label": "Harga",
+        "onPressed": () => {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const MarketPricePage()))
+            }
+      },
+      {
+        "icon": Icons.video_call,
+        "label": "Tutorial",
+        "onPressed": () => {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const TutorialPage()))
+            }
+      },
+      {
+        "icon": Icons.cloud,
+        "label": "Cuaca",
+        "onPressed": () => {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const CuacaPage()))
+            }
+      },
+      {
+        "icon": Icons.water_drop,
+        "label": "Obat",
+        "onPressed": () => {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const ObatPage()))
+            }
+      },
     ];
 
     return GridView.builder(
@@ -141,7 +202,7 @@ class _ProfilePageState extends State<ProfilePage> {
       {
         "icon": Icons.settings,
         "label": "Pengaturan",
-        "onPressed": () => print("Pengaturan button pressed")
+        "onPressed": () => {},
       },
       {
         "icon": Icons.logout,
