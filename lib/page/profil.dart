@@ -90,15 +90,15 @@ class _ProfilePageState extends State<ProfilePage> {
                       'https://static.vecteezy.com/system/resources/previews/005/129/844/non_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg',
                     ),
             ),
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: const Color(0xff00813E),
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                icon: const Icon(Icons.edit, color: Colors.white, size: 16),
-                onPressed: () {},
-              ),
-            ),
+            // CircleAvatar(
+            //   radius: 16,
+            //   backgroundColor: const Color(0xff00813E),
+            //   child: IconButton(
+            //     padding: EdgeInsets.zero,
+            //     icon: const Icon(Icons.edit, color: Colors.white, size: 16),
+            //     onPressed: () {},
+            //   ),
+            // ),
           ],
         ),
         const SizedBox(height: 10),
@@ -114,8 +114,8 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildGridMenu(BuildContext context) {
     final items = [
       {
-        "icon": Icons.add,
-        "label": "Posting",
+        "icon": Icons.article,
+        "label": "Postingan",
         "onPressed": () => Navigator.push(context,
             MaterialPageRoute(builder: (context) => const AddPostPage()))
       },

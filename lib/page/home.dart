@@ -16,9 +16,6 @@ import 'package:taniku/models/tutorial_model.dart';
 import 'package:taniku/models/obat_model.dart';
 import 'package:taniku/models/marketprice_model.dart';
 import 'package:taniku/api/api_taniku.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:convert';
-import 'dart:io';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -109,7 +106,7 @@ class _HomePageState extends State<HomePage> {
               }, // Aksi untuk tambah postingan
               backgroundColor: const Color(0xff00813E),
               child: const Icon(
-                Icons.add,
+                Icons.article,
                 color: Colors.white,
               ),
             ),
