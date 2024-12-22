@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:taniku/models/tutorial_model.dart';
 import 'package:taniku/models/marketprice_model.dart';
@@ -53,18 +54,21 @@ class ApiService {
     }
   }
 
-  Future<List<Postingan>> getPostingan() async {
+  Future<List<Posting>> getPostings() async {
     try {
-      final response = await http.get(Uri.parse("$baseUrl/api/get-post"));
+      final response = await http.get(Uri.parse("$baseUrl/api/get-posting"));
+      log('Response status: ${response.statusCode}');
+      log('Response body: ${response.body}');
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
         final List<dynamic> data = body['data'];
-        return data.map((json) => Postingan.fromJson(json)).toList();
+        return data.map((json) => Posting.fromJson(json)).toList();
       } else {
         throw Exception("Error: ${response.statusCode}");
       }
     } catch (e) {
-      throw Exception("Failed to load postingans: $e");
+      log('Failed to load postings: $e');
+      throw Exception("Failed to load postings: $e");
     }
   }
 
@@ -80,39 +84,6 @@ class ApiService {
       }
     } catch (e) {
       throw Exception("Failed to search: $e");
-    }
-  }
-
-  Future<Map<String, dynamic>> createPost({
-    required String idUser,
-    required String deskripsi,
-    required String displayname,
-    required String photoUserUrl,
-    required String gambarPostingan,
-    int? like,
-  }) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/api/create-post'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'id_user': idUser,
-          'deskripsi': deskripsi,
-          'displayname': displayname,
-          'photo_user_url': photoUserUrl,
-          'gambar_postingan': gambarPostingan,
-          'like': like,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final body = jsonDecode(response.body);
-        return body['data'];
-      } else {
-        throw Exception('Failed to create post: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Failed to create post: $e');
     }
   }
 }

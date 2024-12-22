@@ -1643,82 +1643,51 @@ class AddPostPage extends StatefulWidget {
 }
 
 class _AddPostPageState extends State<AddPostPage> {
-  final TextEditingController _postController = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
-  bool _isPostingButtonVisible = false;
   final ApiService apiService = ApiService();
-  File? _selectedImage;
-
-  @override
-  void initState() {
-    super.initState();
-    _focusNode.addListener(() {
-      setState(() {
-        _isPostingButtonVisible = _focusNode.hasFocus;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _postController.dispose();
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
-    }
-  }
-
-  Future<void> _createPost() async {
-    if (_postController.text.isEmpty || _selectedImage == null) {
-      log('Deskripsi dan gambar tidak boleh kosong');
-      return;
-    }
-
-    try {
-      final user = AuthService().user;
-
-      final bytes = await _selectedImage!.readAsBytes();
-      final base64Image = base64Encode(bytes);
-
-      await apiService.createPost(
-        idUser: user.uid,
-        deskripsi: _postController.text,
-        displayname: user.displayName ?? 'User',
-        photoUserUrl: user.photoURL ??
-            'https://static.vecteezy.com/system/resources/previews/005/129/844/non_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg',
-        gambarPostingan: base64Image,
-      );
-
-      log('Postingan berhasil dibuat');
-
-      Navigator.pop(context);
-    } catch (e) {
-      log('Gagal membuat postingan: $e');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(40), // Tinggi AppBar
+        child: Container(
+          color: Colors.transparent, // Warna AppBar putih
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Align(
+              alignment: Alignment
+                  .bottomCenter, // Menjaga posisi kontainer tetap berada di tengah AppBar
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Tombol Kembali
+                  TextButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.grey,
+                      size: 24,
+                    ),
+                    label: const Text(
+                      "Kembali",
+                      style: TextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    ),
+                    style: TextButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
-        title: const Text("Post",
-            style: TextStyle(fontSize: 24, color: Colors.black)),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
       ),
       body: SingleChildScrollView(
         // Membungkus konten dalam SingleChildScrollView
@@ -1727,81 +1696,19 @@ class _AddPostPageState extends State<AddPostPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: TextField(
-                  controller: _postController,
-                  focusNode: _focusNode,
-                  decoration: const InputDecoration(
-                    hintText: "Tulis sesuatu...",
-                    border: InputBorder.none,
-                  ),
-                  maxLines: 1,
-                ),
-              ),
-              if (_selectedImage != null)
-                Image.file(
-                  _selectedImage!,
-                  height: 150,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-              // Tombol "Posting" muncul saat TextField ditekan
-              if (_isPostingButtonVisible)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: ElevatedButton(
-                        onPressed: _createPost,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Text(
-                          "Posting",
-                          style: TextStyle(
-                              fontFamily: "Righteous", color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: _pickImage,
-                      icon: const Icon(Icons.photo_camera, color: Colors.white),
-                      label: const Text(
-                        "Foto Baru",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xff00813E),
-                        textStyle: const TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-              const SizedBox(height: 15),
-              // Judul untuk "Postingan dari Petani Lain"
+              // Judul untuk "Postingan dari Admin"
               const Text(
-                "Postingan dari Petani Lain",
+                "Postingan dari Admin",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
-              FutureBuilder<List<Postingan>>(
-                future: apiService.getPostingan(),
+              FutureBuilder<List<Posting>>(
+                future: apiService.getPostings(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
+                    log('Error: ${snapshot.error}');
                     return const Center(child: Text('Gagal Memuat Data'));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return const Center(
@@ -1837,9 +1744,10 @@ class _AddPostPageState extends State<AddPostPage> {
                                 // Nama pengguna dan waktu posting
                                 Row(
                                   children: [
-                                    CircleAvatar(
-                                      backgroundImage:
-                                          NetworkImage(post.photoUserUrl),
+                                    const CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                        'https://static.vecteezy.com/system/resources/previews/005/129/844/non_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg',
+                                      ),
                                       radius: 20,
                                     ),
                                     const SizedBox(width: 10),
@@ -1848,7 +1756,7 @@ class _AddPostPageState extends State<AddPostPage> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          post.displayname,
+                                          post.name,
                                           style: const TextStyle(
                                               fontWeight: FontWeight.bold),
                                         ),

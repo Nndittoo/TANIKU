@@ -1,31 +1,25 @@
-class Postingan {
+class Posting {
   final int id;
-  final int idUser;
+  final String name;
   final String deskripsi;
-  final String displayname;
-  final String photoUserUrl;
   final String dibuat;
   final String gambarPostingan;
   final int? like;
 
-  Postingan({
+  Posting({
     required this.id,
-    required this.idUser,
+    required this.name,
     required this.deskripsi,
-    required this.displayname,
-    required this.photoUserUrl,
     required this.dibuat,
     required this.gambarPostingan,
     this.like,
   });
 
-  factory Postingan.fromJson(Map<String, dynamic> json) {
-    return Postingan(
+  factory Posting.fromJson(Map<String, dynamic> json) {
+    return Posting(
       id: json['id'],
-      idUser: json['id_user'],
+      name: json['name'],
       deskripsi: json['deskripsi'],
-      displayname: json['displayname'],
-      photoUserUrl: json['photo_user_url'],
       dibuat: json['dibuat'],
       gambarPostingan: json['gambar_postingan'],
       like: json['like'],
