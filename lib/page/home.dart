@@ -428,6 +428,10 @@ class _HomePageState extends State<HomePage> {
                                 height: 180,
                                 width: double.infinity,
                                 fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Icon(Icons.error,
+                                      color: Colors.black, size: 50);
+                                },
                               ),
                               const SizedBox(height: 10),
                               Text(
@@ -944,7 +948,7 @@ class _ObatPageState extends State<ObatPage> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     image: const DecorationImage(
-                      image: AssetImage("asset/img/post.png"),
+                      image: AssetImage("asset/img/imgobat.png"),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -963,17 +967,6 @@ class _ObatPageState extends State<ObatPage> {
                     softWrap: true,
                   ),
                 ),
-                // const Positioned(
-                //   right: 16,
-                //   bottom: 16,
-                //   child: Text(
-                //     "Tanggal post: 01-10-2024",
-                //     style: TextStyle(
-                //       color: Colors.white70,
-                //       fontSize: 12,
-                //     ),
-                //   ),
-                // ),
               ],
             ),
             const SizedBox(height: 20),
@@ -1695,7 +1688,7 @@ class _AddPostPageState extends State<AddPostPage> {
             children: [
               // Judul untuk "Postingan dari Admin"
               const Text(
-                "Postingan dari Admin",
+                "Informasi Terkait Pertanian",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),

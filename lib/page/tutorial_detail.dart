@@ -109,11 +109,7 @@ class _TutorialDetailPageState extends State<TutorialDetailPage> {
                 //  Center(child: Text('Gagal memuat video: $_errorMessage'))
                 const Center(child: Text('Gagal memuat video'))
                 : _flickManager.flickVideoManager?.isVideoInitialized == true
-                    ? AspectRatio(
-                        aspectRatio:
-                            16 / 10, // Mengatur aspek rasio menjadi 16:10
-                        child: FlickVideoPlayer(flickManager: _flickManager),
-                      )
+                    ? FlickVideoPlayer(flickManager: _flickManager)
                     : const Center(child: CircularProgressIndicator()),
             const SizedBox(height: 10),
             Container(

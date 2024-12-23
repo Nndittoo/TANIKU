@@ -199,11 +199,11 @@ class _ProfilePageState extends State<ProfilePage> {
         "onPressed": () => Navigator.push(context,
             MaterialPageRoute(builder: (context) => const SearchPage()))
       },
-      {
-        "icon": Icons.settings,
-        "label": "Pengaturan",
-        "onPressed": () => {},
-      },
+      // {
+      //   "icon": Icons.settings,
+      //   "label": "Pengaturan",
+      //   "onPressed": () => {},
+      // },
       {
         "icon": Icons.logout,
         "label": "Keluar",

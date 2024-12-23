@@ -448,6 +448,10 @@ class _MarketPriceDetailPageState extends State<MarketPriceDetailPage> {
                   width: 129,
                   height: 116,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(Icons.error,
+                        color: Colors.black, size: 50);
+                  },
                 ),
               ),
               const SizedBox(width: 10),
